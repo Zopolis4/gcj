@@ -1,3 +1,64 @@
+2022-03-23  Zopolis4  <creatorsmithmdt@gmail.com>
+
+	* cp-tree.h (enum cp_tree_index): Re-add CPTI_JAVA_*,
+	CPTI_LANG_NAME_JAVA and CPTI_JCLASS.
+	(java_byte_type_node, java_short_type_node, java_int_type_node,
+	java_long_type_node, java_float_type_node, java_double_type_node,
+	java_char_type_node, java_boolean_type_node, lang_name_java,
+	jclass_node): Re-add.
+	(enum languages): Re-add lang_java.
+	(TYPE_FOR_JAVA): Re-add.
+	(struct lang_type_class): Re-add java_interface bit-field.
+	(TYPE_JAVA_INTERFACE): Re-add.
+	(pragma_java_exceptions): Re-add.
+	(check_java_method, build_java_class_ref): Re-add prototypes.
+	* name-lookup.cc (pushtag_1): Set TYPE_FOR_JAVA.
+	* decl2.cc (acceptable_java_type, check_java_method): Re-add.
+	(import_export_decl): Re-add TYPE_FOR_JAVA handling.
+	(build_java_method_aliases): Re-add.
+	(c_parse_final_cleanups): Call build_java_method_aliases.
+	(possibly_inlined_p): Test pragma_java_exceptions.
+	* init.cc (build_new_1): Re-add TYPE_FOR_JAVA handling.
+	(build_java_class_ref): Re-add.
+	* pt.cc (maybe_new_partial_specialization, lookup_template_class_1,
+	instantiate_class_template_1): Copy TYPE_FOR_JAVA.
+	* except.cc (eh_type_info): Re-add java type handling.
+	(decl_is_java_type, choose_personality_routine): b
+	(initialize_handler_parm): Call choose_personality_routine.
+	(expand_start_catch_block): Handle java types.
+	(build_throw): Likewise.
+	* cp-lang.c (cp_eh_personality): Handle pragma_java_exceptions.
+	* typeck.c (structural_comptypes): Compare TYPE_FOR_JAVA.
+	* call.c (build_over_call): Handle TYPE_JAVA_INTERFACE.
+	(java_iface_lookup_fn): Re-add.
+	(build_java_interface_fn_ref): Re-add.
+	* tree.c (cxx_attribute_table): Re-add java_interface.
+	(handle_java_interface_attribute): Re-add.
+	* lex.c (pragma_java_exceptions): Re-add.
+	(init_cp_pragma): Register GCC java_exceptions pragma.
+	(handle_pragma_java_exceptions): Re-add.
+	(retrofit_lang_decl): Handle lang_name_java.
+	* method.c (implicitly_declare_fn): Handle TYPE_FOR_JAVA.
+	* error.c (language_to_string): Jandle lang_java.
+	* decl.c (record_builtin_java_type): Re-add.
+	(initialize_predefined_identifiers): Re-add Java.
+	(cxx_init_decl_processing): Re-add java_*_type_node.
+	(cp_finish_decl): Handle TYPE_FOR_JAVA.
+	(grokfndecl): Likewise.
+	(check_special_function_return_type): Likewise.
+	(grokdeclarator): Set TYPE_FOR_JAVA.
+	(grokparms): Handle TYPE_FOR_JAVA.
+	(xref_basetypes): Likewise.
+	(check_function_type): Likewise.
+	(finish_constructor_body): Likewise.
+	* mangle.c (write_builtin_type): Handle TYPE_FOR_JAVA
+	and java_*_type_node.
+	(write_bare_function_type): Handle TYPE_FOR_JAVA.
+	(write_java_integer_type_codes): Re-add.
+	* class.c (add_implicitly_declared_members): Handle TYPE_FOR_JAVA.
+	(determine_key_method, finish_struct_1): Likewise.
+	(push_lang_context): Handle lang_name_java.
+
 2022-03-09  Patrick Palka  <ppalka@redhat.com>
 
 	PR c++/104823

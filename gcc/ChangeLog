@@ -1,3 +1,38 @@
+2022-03-24  Zopolis4  <creatorsmithmdt@gmail.com>
+
+	* config/darwin.cc: Re-add the java workaround constraint about
+	putting small items into data/static data.
+	* config/i386/cygming.h (MODIFY_JNI_METHOD_CALL): Define.
+	* config/i386/cygwin.h (LIBGCJ_SONAME): Re-add.
+	* config/i386/mingw32.h (LIBGCJ_SONAME): Likewise.
+	* doc/tm.texi.in: Document MODIFY_JNI_METHOD_CALL again.
+	* doc/tm.texi: Regenerate.
+	* doc/cfg.texi: Re-add references to gcj/java/libjava.
+	* doc/extend.texi: Likewise.
+	* doc/frontends.texi: Likewise.
+	* doc/generic.texi: Likewise.
+	* doc/install.texi: Likewise.
+	* doc/invoke.texi: Likewise.
+	* doc/md.texi: Likewise.
+	* doc/sourcebuild.texi: Likewise.
+	* doc/standards.texi: Likewise.
+	* cfgexpand.cc: Likewise.
+	* dwarf2out.cc: Likewise.
+	* gcc.cc: Likewise.
+	* gimple-expr.cc: Likewise.
+	* gimplify.c: Likewise.
+	* ipa-utils.h: Likewise.
+	* langhooks.h: Likewise.
+	* opts.cc: Likewise.
+	* tree-cfg.cc: Likewise.
+	* tree-eh.cc: Likewise.
+	* tree.cc: Likewise.
+	* varasm.cc: Likewise.
+	* ipa-free-lang.data.c: Re-add references to Java
+	that were previously in tree.cc.
+	* gimple-fold.c (canonicalize_constructor_val):
+	set TREE_ADDRESSABLE for java.
+
 2022-03-09  Richard Biener  <rguenther@suse.de>
 
 	* cfgexpand.cc (expand_gimple_asm): Special-case MEM_REF

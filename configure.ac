@@ -30,6 +30,7 @@ m4_include([ltsugar.m4])
 m4_include([ltversion.m4])
 m4_include([lt~obsolete.m4])
 m4_include([config/isl.m4])
+m4_include([config/pkg.m4])
 
 AC_INIT(move-if-change)
 AC_DISABLE_OPTION_CHECKING
@@ -142,6 +143,11 @@ host_libs="intl libiberty opcodes bfd readline tcl tk itcl libgui zlib libbacktr
 # If --enable-gold is used, "gold" may replace "ld".
 host_tools="texinfo flex bison binutils gas ld fixincludes gcc cgen sid sim gdb gdbserver gprof etc expect dejagnu m4 utils guile fastjar gnattools libcc1 gotools c++tools"
 
+# libgcj represents the runtime libraries only used by gcj.
+libgcj="target-libffi \
+	target-zlib \
+	target-libjava"
+
 # these libraries are built for the target environment, and are built after
 # the host libraries and the host tools (which may be a cross compiler)
 # Note that libiberty is not a target library.
@@ -159,6 +165,8 @@ target_libraries="target-libgcc \
 		target-libssp \
 		target-libquadmath \
 		target-libgfortran \
+		target-boehm-gc \
+		${libgcj} \
 		target-libffi \
 		target-libobjc \
 		target-libada \
@@ -509,6 +517,41 @@ else
 fi])
 AC_SUBST(extra_liboffloadmic_configure_flags)
 
+# Save it here so that, even in case of --enable-libgcj, if the Java
+# front-end isn't enabled, we still get libgcj disabled.
+libgcj_saved=$libgcj
+case $enable_libgcj in
+yes)
+  # If we reset it here, it won't get added to noconfigdirs in the
+  # target-specific build rules, so it will be forcibly enabled
+  # (unless the Java language itself isn't enabled).
+  libgcj=
+  ;;
+no)
+  # Make sure we get it printed in the list of not supported target libs.
+  # Don't disable libffi, though, other languages use it.
+  noconfigdirs="$noconfigdirs `echo ${libgcj} | sed -e 's/target-libffi//'`"
+  # Clear libgcj_saved so that even if java is enabled libffi won't be
+  # built.
+  libgcj_saved=
+  ;;
+esac
+
+AC_ARG_ENABLE(static-libjava,
+[AS_HELP_STRING([[--enable-static-libjava[=ARG]]],
+               [build static libjava @<:@default=no@:>@])],
+ENABLE_STATIC_LIBJAVA=$enableval,
+ENABLE_STATIC_LIBJAVA=no)
+enable_static_libjava=
+if test "${ENABLE_STATIC_LIBJAVA}" = "yes" ; then
+  enable_static_libjava=yes
+fi
+
+if test x$enable_static_libjava != xyes ; then
+  EXTRA_CONFIGARGS_LIBJAVA=--disable-static
+fi
+AC_SUBST(EXTRA_CONFIGARGS_LIBJAVA)
+
 # Enable libgomp by default on hosted POSIX systems, and a few others.
 if test x$enable_libgomp = x ; then
     case "${target}" in
@@ -746,7 +789,14 @@ case "${target}" in
     ;;
 esac
 
-# Disable libffi for some systems.
+# Disable Java if it is not supported.
+case "${target}" in
+  *-*-*)
+    unsupported_languages="$unsupported_languages java"
+    ;;
+esac
+
+# Disable Java, libgcj, libffi and related libraries for some systems.
 case "${target}" in
   powerpc-*-darwin*)
     ;;
@@ -755,84 +805,84 @@ case "${target}" in
   x86_64-*-darwin[[912]]*)
     ;;
   *-*-darwin*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   *-*-netware*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   *-*-phoenix*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   *-*-rtems*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   *-*-tpf*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   *-*-uclinux*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   *-*-vxworks*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   aarch64*-*-freebsd*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   alpha*-*-*vms*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   arm*-*-freebsd*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   arm-wince-pe)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   arm*-*-symbianelf*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   bpf-*-*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   cris-*-* | crisv32-*-*)
     case "${target}" in
       *-*-linux*)
 	;;
       *) # See PR46792 regarding target-libffi.
-	noconfigdirs="$noconfigdirs target-libffi";;
+	noconfigdirs="$noconfigdirs ${libgcj}";;
     esac
     ;;
   hppa*64*-*-hpux*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   hppa*-hp-hpux11*)
     ;;
   hppa*-*-hpux*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   ia64*-*-*vms*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   i[[3456789]]86-w64-mingw*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   i[[3456789]]86-*-mingw*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   x86_64-*-mingw*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   mmix-*-*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   powerpc-*-aix*)
     ;;
   rs6000-*-aix*)
     ;;
   ft32-*-*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   *-*-lynxos*)
-    noconfigdirs="$noconfigdirs target-libffi"
+    noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
 esac
 
@@ -2315,25 +2365,32 @@ done
 # Check for Boehm's garbage collector
 AC_ARG_ENABLE(objc-gc,
 [AS_HELP_STRING([--enable-objc-gc],
-		[enable use of Boehm's garbage collector with the
-		 GNU Objective-C runtime])])
+               [enable use of Boehm's garbage collector with the
+                GNU Objective-C runtime])],
+[case ,${enable_languages},:${enable_objc_gc}:${noconfigdirs} in
+  *,objc,*:*:yes:*target-boehm-gc*)
+    AC_MSG_ERROR([Boehm's garbage collector was requested yet not supported in this configuration])
+    ;;
+esac])
 AC_ARG_WITH([target-bdw-gc],
 [AS_HELP_STRING([--with-target-bdw-gc=PATHLIST],
-		[specify prefix directory for installed bdw-gc package.
-		 Equivalent to --with-target-bdw-gc-include=PATH/include
-		 plus --with-target-bdw-gc-lib=PATH/lib])])
+               [specify prefix directory for installed bdw-gc package.
+                Equivalent to --with-target-bdw-gc-include=PATH/include
+                plus --with-target-bdw-gc-lib=PATH/lib])])
 AC_ARG_WITH([target-bdw-gc-include],
 [AS_HELP_STRING([--with-target-bdw-gc-include=PATHLIST],
-		[specify directories for installed bdw-gc include files])])
+               [specify directories for installed bdw-gc include files])])
 AC_ARG_WITH([target-bdw-gc-lib],
 [AS_HELP_STRING([--with-target-bdw-gc-lib=PATHLIST],
-		[specify directories for installed bdw-gc library])])
-		  
+               [specify directories for installed bdw-gc library])])
+                 
 case ,${enable_languages},:${enable_objc_gc} in *,objc,*:yes|*,objc,*:auto)
   AC_MSG_CHECKING([for bdw garbage collector])
   if test "x$with_target_bdw_gc$with_target_bdw_gc_include$with_target_bdw_gc_lib" = x; then
-    dnl no bdw-gw options, assume default locations
-    AC_MSG_RESULT([using bdw-gc in default locations])
+    dnl no bdw-gw options, fall back to the bdw-gc pkg-config module
+    PKG_CHECK_EXISTS(bdw-gc,
+      AC_MSG_RESULT([using bdw-gc pkg-config module]),
+      AC_MSG_ERROR([no --with-target-bdw-gc options and no bdw-gc pkg-config module found]))
   else
     dnl bdw-gw options, first error checking, complete checking in libobjc
     if test "x$with_target_bdw_gc_include" = x && test "x$with_target_bdw_gc_lib" != x; then
@@ -2344,6 +2401,19 @@ case ,${enable_languages},:${enable_objc_gc} in *,objc,*:yes|*,objc,*:auto)
       AC_MSG_RESULT([using paths configured with --with-target-bdw-gc options])
     fi
   fi
+esac
+
+# Make sure we only build Boehm's garbage collector if required.
+case ,${enable_languages},:${enable_objc_gc} in
+  *,objc,*:yes|*,objc,*:auto)
+    # Keep target-boehm-gc if requested for Objective-C.
+    ;;
+  *)
+    # Otherwise remove target-boehm-gc depending on target-libjava.
+    if echo " ${noconfigdirs} " | grep "target-libjava" >/dev/null 2>&1; then
+      noconfigdirs="$noconfigdirs target-boehm-gc"
+    fi
+    ;;
 esac
 
 # Disable libitm, libsanitizer, libvtv, liboffloadmic if we're not building C++
@@ -2439,6 +2509,15 @@ for i in ${target_configdirs_all} ; do
     target_configdirs="${target_configdirs} $i"
   fi
 done
+
+# Exclude target-zlib if target-libjava isn't built.
+case ${target_configdirs} in
+*target-libjava*)
+  ;;
+*)
+  target_configdirs="`echo ${target_configdirs} | sed -e 's/target-zlib//'`"
+  ;;
+esac
 
 # libiberty-linker-plugin is special: it doesn't have its own source directory,
 # so we have to add it after the preceding checks.
@@ -3651,6 +3730,8 @@ GCC_TARGET_TOOL(c++ for libstdc++, RAW_CXX_FOR_TARGET, CXX,
 GCC_TARGET_TOOL(dlltool, DLLTOOL_FOR_TARGET, DLLTOOL, [binutils/dlltool])
 GCC_TARGET_TOOL(dsymutil, DSYMUTIL_FOR_TARGET, DSYMUTIL)
 GCC_TARGET_TOOL(gcc, GCC_FOR_TARGET, , [gcc/xgcc -B$$r/$(HOST_SUBDIR)/gcc/])
+GCC_TARGET_TOOL(gcj, GCJ_FOR_TARGET, GCJ,
+		[gcc/gcj -B$$r/$(HOST_SUBDIR)/gcc/], java)
 GCC_TARGET_TOOL(gfortran, GFORTRAN_FOR_TARGET, GFORTRAN,
 		[gcc/gfortran -B$$r/$(HOST_SUBDIR)/gcc/], fortran)
 GCC_TARGET_TOOL(gccgo, GOC_FOR_TARGET, GOC,

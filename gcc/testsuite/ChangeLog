@@ -1,3 +1,21 @@
+2022-03-24  Zopolis4  <creatorsmithmdt@gmail.com>
+
+	* g++.dg/other/java3.C: Re-add.
+	* g++.dg/other/java1.C: Likewise.
+	* g++.dg/other/error12.C: Likewise.
+	* g++.dg/other/java2.C: Likewise.
+	* g++.dg/warn/Wnvdtor.C: Likewise.
+	* g++.dg/lookup/java1.C: Likewise.
+	* g++.dg/lookup/java2.C: Likewise.
+	* g++.dg/ext/pr34829.C: Likewise.
+	* g++.dg/ext/java-3.C: Likewise.
+	* g++.dg/ext/java-1.C: Likewise.
+	* g++.dg/ext/java-2.C: Likewise.
+	* g++.old-deja/g++.oliva/dwarf2.C: Likewise.
+	* g++.dg/tree-ssa/array-temp1.C: Adjust for 
+	canonicalize_constructor_val setting TREE_ADDRESSABLE on bases
+	of ADDR_EXPRs again.
+
 2022-03-09  Joseph Myers  <joseph@codesourcery.com>
 
 	* gcc.dg/c11-unproto-1.c, gcc.dg/c11-unproto-2.c: Update comments.

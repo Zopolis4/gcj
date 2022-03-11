@@ -1,3 +1,15 @@
+2022-03-13  Zopolis4  <creatorsmithmdt@gmail.com>
+
+	* config-ml.in: Re-add references to GCJ.
+	* Makefile.def: Re-add libjava and boehm-gc.
+	* Makefile.tpl: Likewise.
+	* Makefile.in: Regenerate.
+	* configure.ac: Likewise.
+	* configure: Likewise.
+	* gcc/java: Re-add.
+	* libjava: Likewise.
+	* boehm-gc: Likewise.
+
 2022-03-09  Hans-Peter Nilsson  <hp@axis.com>
 
 	* Makefile.def (dependencies): Make configure-sim depend on

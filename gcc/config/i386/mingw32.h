@@ -295,3 +295,5 @@ do {						         \
 #endif
 #define LIBGCC_SONAME "libgcc_s" LIBGCC_EH_EXTN "-1.dll"
 
+/* We should find a way to not have to update this manually.  */
+#define LIBGCJ_SONAME "cyggcj" /*LIBGCC_EH_EXTN*/ "-16.dll"
