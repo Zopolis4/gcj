@@ -30,6 +30,7 @@ m4_include([ltsugar.m4])
 m4_include([ltversion.m4])
 m4_include([lt~obsolete.m4])
 m4_include([config/isl.m4])
+m4_include([config/pkg.m4])
 
 AC_INIT(move-if-change)
 AC_DISABLE_OPTION_CHECKING
@@ -159,6 +160,7 @@ target_libraries="target-libgcc \
 		target-libssp \
 		target-libquadmath \
 		target-libgfortran \
+		target-libjava \
 		target-libffi \
 		target-libobjc \
 		target-libada \
@@ -509,6 +511,21 @@ else
 fi])
 AC_SUBST(extra_liboffloadmic_configure_flags)
 
+AC_ARG_ENABLE(static-libjava,
+[AS_HELP_STRING([[--enable-static-libjava[=ARG]]],
+               [build static libjava @<:@default=no@:>@])],
+ENABLE_STATIC_LIBJAVA=$enableval,
+ENABLE_STATIC_LIBJAVA=no)
+enable_static_libjava=
+if test "${ENABLE_STATIC_LIBJAVA}" = "yes" ; then
+  enable_static_libjava=yes
+fi
+
+if test x$enable_static_libjava != xyes ; then
+  EXTRA_CONFIGARGS_LIBJAVA=--disable-static
+fi
+AC_SUBST(EXTRA_CONFIGARGS_LIBJAVA)
+
 # Enable libgomp by default on hosted POSIX systems, and a few others.
 if test x$enable_libgomp = x ; then
     case "${target}" in
@@ -796,9 +813,9 @@ case "${target}" in
   cris-*-* | crisv32-*-*)
     case "${target}" in
       *-*-linux*)
-	;;
-      *) # See PR46792 regarding target-libffi.
-	noconfigdirs="$noconfigdirs target-libffi";;
+  ;;
+  *) # See PR46792 regarding target-libffi.
+  noconfigdirs="$noconfigdirs target-libffi";;
     esac
     ;;
   hppa*64*-*-hpux*)
@@ -1345,6 +1362,7 @@ if test "${build}" != "${host}" ; then
   CPP_FOR_BUILD="${CPP_FOR_BUILD-\$(CC_FOR_BUILD) -E}"
   CXX_FOR_BUILD=${CXX_FOR_BUILD-g++}
   DSYMUTIL_FOR_BUILD=${DSYMUTIL_FOR_BUILD-dsymutil}
+  GCJ_FOR_BUILD=${GCJ_FOR_BUILD-gcj}
   GFORTRAN_FOR_BUILD=${GFORTRAN_FOR_BUILD-gfortran}
   GOC_FOR_BUILD=${GOC_FOR_BUILD-gccgo}
   GDC_FOR_BUILD=${GDC_FOR_BUILD-gdc}
@@ -1360,6 +1378,7 @@ else
   CC_FOR_BUILD="\$(CC)"
   CXX_FOR_BUILD="\$(CXX)"
   DSYMUTIL_FOR_BUILD="\$(DSYMUTIL)"
+  GCJ_FOR_BUILD="\$(GCJ)"
   GFORTRAN_FOR_BUILD="\$(GFORTRAN)"
   GOC_FOR_BUILD="\$(GOC)"
   GDC_FOR_BUILD="\$(GDC)"
@@ -2313,21 +2332,21 @@ done
 # Check for Boehm's garbage collector
 AC_ARG_ENABLE(objc-gc,
 [AS_HELP_STRING([--enable-objc-gc],
-		[enable use of Boehm's garbage collector with the
-		 GNU Objective-C runtime])])
+    [enable use of Boehm's garbage collector with the
+     GNU Objective-C runtime])])
 AC_ARG_WITH([target-bdw-gc],
 [AS_HELP_STRING([--with-target-bdw-gc=PATHLIST],
-		[specify prefix directory for installed bdw-gc package.
-		 Equivalent to --with-target-bdw-gc-include=PATH/include
-		 plus --with-target-bdw-gc-lib=PATH/lib])])
+    [specify prefix directory for installed bdw-gc package.
+     Equivalent to --with-target-bdw-gc-include=PATH/include
+     plus --with-target-bdw-gc-lib=PATH/lib])])
 AC_ARG_WITH([target-bdw-gc-include],
 [AS_HELP_STRING([--with-target-bdw-gc-include=PATHLIST],
-		[specify directories for installed bdw-gc include files])])
+    [specify directories for installed bdw-gc include files])])
 AC_ARG_WITH([target-bdw-gc-lib],
 [AS_HELP_STRING([--with-target-bdw-gc-lib=PATHLIST],
-		[specify directories for installed bdw-gc library])])
-		  
-case ,${enable_languages},:${enable_objc_gc} in *,objc,*:yes|*,objc,*:auto)
+    [specify directories for installed bdw-gc library])])
+
+case ,${enable_languages},:${enable_objc_gc} in *,java,*:*|*,objc,*:yes|*,objc,*:auto)
   AC_MSG_CHECKING([for bdw garbage collector])
   if test "x$with_target_bdw_gc$with_target_bdw_gc_include$with_target_bdw_gc_lib" = x; then
     dnl no bdw-gw options, assume default locations
@@ -2437,6 +2456,15 @@ for i in ${target_configdirs_all} ; do
     target_configdirs="${target_configdirs} $i"
   fi
 done
+
+# Exclude target-zlib if target-libjava isn't built.
+case ${target_configdirs} in
+*target-libjava*)
+  ;;
+*)
+  target_configdirs="`echo ${target_configdirs} | sed -e 's/target-zlib//'`"
+  ;;
+esac
 
 # libiberty-linker-plugin is special: it doesn't have its own source directory,
 # so we have to add it after the preceding checks.
@@ -3500,6 +3528,7 @@ AC_SUBST(CXXFLAGS_FOR_BUILD)
 AC_SUBST(CXX_FOR_BUILD)
 AC_SUBST(DLLTOOL_FOR_BUILD)
 AC_SUBST(DSYMUTIL_FOR_BUILD)
+AC_SUBST(GCJ_FOR_BUILD)
 AC_SUBST(GFORTRAN_FOR_BUILD)
 AC_SUBST(GOC_FOR_BUILD)
 AC_SUBST(GDC_FOR_BUILD)
@@ -3614,6 +3643,7 @@ AC_ARG_WITH([build-time-tools],
 NCN_STRICT_CHECK_TARGET_TOOLS(CC_FOR_TARGET, cc gcc)
 NCN_STRICT_CHECK_TARGET_TOOLS(CXX_FOR_TARGET, c++ g++ cxx gxx)
 NCN_STRICT_CHECK_TARGET_TOOLS(GCC_FOR_TARGET, gcc, ${CC_FOR_TARGET})
+NCN_STRICT_CHECK_TARGET_TOOLS(GCJ_FOR_TARGET, gcj)
 NCN_STRICT_CHECK_TARGET_TOOLS(GFORTRAN_FOR_TARGET, gfortran)
 NCN_STRICT_CHECK_TARGET_TOOLS(GOC_FOR_TARGET, gccgo)
 NCN_STRICT_CHECK_TARGET_TOOLS(GDC_FOR_TARGET, gdc)
@@ -3649,6 +3679,8 @@ GCC_TARGET_TOOL(c++ for libstdc++, RAW_CXX_FOR_TARGET, CXX,
 GCC_TARGET_TOOL(dlltool, DLLTOOL_FOR_TARGET, DLLTOOL, [binutils/dlltool])
 GCC_TARGET_TOOL(dsymutil, DSYMUTIL_FOR_TARGET, DSYMUTIL)
 GCC_TARGET_TOOL(gcc, GCC_FOR_TARGET, , [gcc/xgcc -B$$r/$(HOST_SUBDIR)/gcc/])
+GCC_TARGET_TOOL(gcj, GCJ_FOR_TARGET, GCJ,
+		[gcc/gcj -B$$r/$(HOST_SUBDIR)/gcc/], java)
 GCC_TARGET_TOOL(gfortran, GFORTRAN_FOR_TARGET, GFORTRAN,
 		[gcc/gfortran -B$$r/$(HOST_SUBDIR)/gcc/], fortran)
 GCC_TARGET_TOOL(gccgo, GOC_FOR_TARGET, GOC,

@@ -12113,6 +12113,22 @@ object files that are not referenced from @code{main} and uses export
 lists.
 @end defmac
 
+@defmac MODIFY_JNI_METHOD_CALL (@var{mdecl})
+Define this macro to a C expression representing a variant of the
+method call @var{mdecl}, if Java Native Interface (JNI) methods
+must be invoked differently from other methods on your target.
+For example, on 32-bit Microsoft Windows, JNI methods must be invoked using
+the @code{stdcall} calling convention and this macro is then
+defined as this expression:
+
+@smallexample
+build_type_attribute_variant (@var{mdecl},
+                              build_tree_list
+                              (get_identifier ("stdcall"),
+                               NULL))
+@end smallexample
+@end defmac
+
 @deftypefn {Target Hook} bool TARGET_CANNOT_MODIFY_JUMPS_P (void)
 This target hook returns @code{true} past the point in which new jump
 instructions could be created.  On machines that require a register for
@@ -12300,6 +12316,12 @@ default to false and also handles @code{error_mark_node}.
 
 The default implementation always returns true.
 @end deftypefn
+
+@defmac TARGET_USE_JCR_SECTION
+This macro determines whether to use the JCR section to register Java
+classes. By default, TARGET_USE_JCR_SECTION is defined to 1 if both
+SUPPORTS_WEAK and TARGET_HAVE_NAMED_SECTIONS are true, else 0.
+@end defmac
 
 @defmac OBJC_JBLEN
 This macro determines the size of the objective C jump buffer for the

@@ -451,6 +451,8 @@ free_lang_data_in_type (tree type, class free_lang_data_d *fld)
 	  /* C++ FE uses TREE_PURPOSE to store initial values.  */
 	  TREE_PURPOSE (p) = NULL;
 	}
+      /* Java uses TYPE_MIN_VALUE for TYPE_ARGUMENT_SIGNATURE.  */
+      TYPE_MIN_VALUE (type) = NULL;
     }
   else if (TREE_CODE (type) == METHOD_TYPE)
     {
@@ -461,6 +463,8 @@ free_lang_data_in_type (tree type, class free_lang_data_d *fld)
 	  TREE_VALUE (p) = fld_simplified_type (TREE_VALUE (p), fld);
 	  TREE_PURPOSE (p) = NULL;
 	}
+      /* Java uses TYPE_MIN_VALUE for TYPE_ARGUMENT_SIGNATURE.  */
+      TYPE_MIN_VALUE (type) = NULL;
     }
   else if (RECORD_OR_UNION_TYPE_P (type))
     {
@@ -798,6 +802,16 @@ find_decls_types_r (tree *tp, int *ws, void *data)
 	  tree tem;
 	  FOR_EACH_VEC_ELT (*BINFO_BASE_BINFOS (TYPE_BINFO (t)), i, tem)
 	    fld_worklist_push (TREE_TYPE (tem), fld);
+	  tem = BINFO_VIRTUALS (TYPE_BINFO (t));
+	  if (tem
+	      /* The Java FE overloads BINFO_VIRTUALS for its own purpose.  */
+	      && TREE_CODE (tem) == TREE_LIST)
+	    do
+	      {
+		fld_worklist_push (TREE_VALUE (tem), fld);
+		tem = TREE_CHAIN (tem);
+	      }
+	    while (tem);
 	  fld_worklist_push (BINFO_TYPE (TYPE_BINFO (t)), fld);
 	  fld_worklist_push (BINFO_VTABLE (TYPE_BINFO (t)), fld);
 	}

@@ -8138,6 +8138,9 @@ pushtag (tree name, tree type, TAG_how how)
       if (!context)
 	context = current_namespace;
 
+      if (current_lang_name == lang_name_java)
+	TYPE_FOR_JAVA (type) = 1;
+
       tdef = create_implicit_typedef (name, type);
       DECL_CONTEXT (tdef) = FROB_CONTEXT (context);
       set_originating_module (tdef);

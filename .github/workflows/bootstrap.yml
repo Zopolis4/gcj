@@ -1,0 +1,41 @@
+name: Bootstrap
+
+on:
+  push:
+    branches: [msterstable]
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Deps
+      run: |
+          sudo apt-get update;
+          sudo apt-get install -y \
+                  automake \
+                  autoconf \
+                  libtool \
+                  autogen \
+                  bison \
+                  flex \
+                  libgmp3-dev \
+                  libmpfr-dev \
+                  libmpc-dev \
+                  build-essential \
+                  gcc-multilib \
+                  g++-multilib \
+    - name: Configure
+      run: |
+           mkdir -p gcj-build;
+           cd gcj-build;
+           ../configure \
+               --enable-languages=java
+    - name: Build
+      shell: bash
+      run: |
+           cd gcj-build; \
+           make -j $(nproc);
+           make

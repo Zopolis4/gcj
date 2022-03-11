@@ -631,6 +631,29 @@ class LibGCCFilter (GenericFilter):
                 'soft-fp',
                 ])
 
+class LibJavaFilter (GenericFilter):
+    def __init__ (self):
+        GenericFilter.__init__ (self)
+
+        self.skip_dirs |= set ([
+                # Handled separately.
+                'testsuite',
+
+                # Not really part of the library
+                'contrib',
+
+                # Imported from upstream
+                'classpath',
+                'libltdl',
+                ])
+
+    def get_line_filter (self, dir, filename):
+        if filename == 'NameDecoder.h':
+            return re.compile ('.*NAME_COPYRIGHT')
+        if filename == 'ICC_Profile.h':
+            return re.compile ('.*icSigCopyrightTag')
+        return GenericFilter.get_line_filter (self, dir, filename)
+
 class LibPhobosFilter (GenericFilter):
     def __init__ (self):
         GenericFilter.__init__ (self)
@@ -759,6 +782,8 @@ class GCCCmdLine (CmdLine):
         self.add_dir ('libgomp')
         self.add_dir ('libiberty')
         self.add_dir ('libitm')
+        self.add_dir ('libjava', LibJavaFilter())
+        self.add_dir (os.path.join ('libjava', 'testsuite'), TestsuiteFilter())
         self.add_dir ('libobjc')
         # liboffloadmic is imported from upstream.
         self.add_dir ('libphobos', LibPhobosFilter())

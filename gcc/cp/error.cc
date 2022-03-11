@@ -3322,6 +3322,9 @@ language_to_string (enum languages c)
     case lang_cplusplus:
       return "C++";
 
+    case lang_java:
+      return "Java";
+
     default:
       gcc_unreachable ();
     }

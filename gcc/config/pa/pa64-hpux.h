@@ -164,6 +164,8 @@ along with GCC; see the file COPYING3.  If not see
 #define DATA_SECTION_ASM_OP	"\t.data"
 #define BSS_SECTION_ASM_OP	"\t.section\t.bss"
 
+#define JCR_SECTION_NAME ".jcr"
+
 #define HP_INIT_ARRAY_SECTION_ASM_OP	"\t.section\t.init"
 #define GNU_INIT_ARRAY_SECTION_ASM_OP	"\t.section\t.init_array"
 #define HP_FINI_ARRAY_SECTION_ASM_OP	"\t.section\t.fini"

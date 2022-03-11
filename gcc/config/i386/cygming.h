@@ -376,6 +376,14 @@ do {						\
 	const0_rtx));							\
     }
 
+/* Java Native Interface (JNI) methods on Win32 are invoked using the
+   stdcall calling convention.  */
+#undef MODIFY_JNI_METHOD_CALL
+#define MODIFY_JNI_METHOD_CALL(MDECL)					      \
+  build_type_attribute_variant ((MDECL),				      \
+			       build_tree_list (get_identifier ("stdcall"),   \
+						NULL))
+
 /* For Win32 ABI compatibility */
 #undef DEFAULT_PCC_STRUCT_RETURN
 #define DEFAULT_PCC_STRUCT_RETURN 0
@@ -435,6 +443,11 @@ do {						\
   while (0)
 
 #endif /* HAVE_GAS_WEAK */
+
+/* FIXME: SUPPORTS_WEAK && TARGET_HAVE_NAMED_SECTIONS is true,
+   but for .jcr section to work we also need crtbegin and crtend
+   objects.  */
+#define TARGET_USE_JCR_SECTION 1
 
 /* Decide whether it is safe to use a local alias for a virtual function
    when constructing thunks.  */

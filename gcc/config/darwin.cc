@@ -2482,7 +2482,11 @@ darwin_emit_local_bss (FILE *fp, tree decl, const char *name,
 			unsigned HOST_WIDE_INT size,
 			unsigned int l2align)
 {
-   if (DARWIN_SECTION_ANCHORS && flag_section_anchors && size < BYTES_ZFILL)
+   /* FIXME: We have a fudge to make this work with Java even when the target does
+   not use sections anchors -- Java seems to need at least one small item in a
+   non-zerofill segment.   */
+   if ((DARWIN_SECTION_ANCHORS && flag_section_anchors && size < BYTES_ZFILL)
+       || (size && size <= 2))
     {
       /* Put smaller objects in _static_data, where the section anchors system
 	 can get them.
@@ -2649,8 +2653,9 @@ fprintf (fp, "# albss: %s (%lld,%d) ro %d cst %d stat %d com %d"
       return;
     }
 
-  /* So we have a public symbol.  */
-  if (DARWIN_SECTION_ANCHORS && flag_section_anchors && size < BYTES_ZFILL)
+  /* So we have a public symbol (small item fudge for Java, see above).  */
+  if ((DARWIN_SECTION_ANCHORS && flag_section_anchors && size < BYTES_ZFILL)
+       || (size && size <= 2))
     {
       /* Put smaller objects in data, where the section anchors system can get
 	 them.  However, if they are zero-sized punt them to yet a different

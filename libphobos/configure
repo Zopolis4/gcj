@@ -15341,7 +15341,7 @@ $as_echo "found" >&6; }
   else
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: just compiled" >&5
 $as_echo "just compiled" >&6; }
-    LIBZ=../../zlib/libz_convenience.la
+    LIBZ=../../zlib/libzgcj_convenience.la
   fi
 
 
@@ -16409,6 +16409,7 @@ CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
 CC="$CC"
 CXX="$CXX"
 GFORTRAN="$GFORTRAN"
+GCJ="$GCJ"
 GDC="$GDC"
 
 

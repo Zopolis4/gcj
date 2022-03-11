@@ -490,7 +490,7 @@ jump_threader::simplify_control_stmt_condition_1
      example, op0 might be a constant while op1 is an
      SSA_NAME.  Failure to canonicalize will cause us to
      miss threading opportunities.  */
-  if (tree_swap_operands_p (op0, op1))
+  if (tree_swap_operands_p (op0, op1, false))
     {
       cond_code = swap_tree_comparison (cond_code);
       std::swap (op0, op1);

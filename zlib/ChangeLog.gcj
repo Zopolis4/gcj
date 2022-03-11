@@ -1,3 +1,11 @@
+2022-03-24  Zopolis4  <creatorsmithmdt@gmail.com>
+
+	* Makefile.am (noinst_LTLIBRARIES): Rename libz_convience.la to
+	libzgcj_convenience.la.
+	* Makefile.in: Regenerate.
+	* configure.ac: Re-add target_all.
+	* configure: Regenerate.
+
 2020-05-15  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR bootstrap/95147

@@ -98,7 +98,7 @@ AC_DEFUN([DRUNTIME_LIBRARIES_ZLIB],
     AC_MSG_ERROR([system zlib required but not found])
   else
     AC_MSG_RESULT([just compiled])
-    LIBZ=../../zlib/libz_convenience.la
+    LIBZ=../../zlib/libzgcj_convenience.la
   fi
 
   AC_SUBST(LIBZ)
