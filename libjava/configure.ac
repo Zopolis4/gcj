@@ -1,10 +1,7 @@
 dnl # Process this with autoconf to create configure
 
-sinclude(../config/sjlj.m4)
-
-AC_PREREQ(2.64)
 # Still use "libjava" here to placate dejagnu.
-AC_INIT([libjava], [version-unused],, [libjava])
+AC_INIT([libjava], [version-unused], [libjava])
 
 AC_CONFIG_SRCDIR(java/lang/System.java)
 
@@ -22,8 +19,8 @@ AC_ARG_WITH(target-subdir,
 AM_ENABLE_MULTILIB(, ..)
 
 AC_CANONICAL_SYSTEM
-_GCC_TOPLEV_NONCANONICAL_BUILD
-_GCC_TOPLEV_NONCANONICAL_TARGET
+ACX_NONCANONICAL_BUILD
+ACX_NONCANONICAL_TARGET
 
 AC_SUBST(target_noncanonical)
 
@@ -41,9 +38,17 @@ AC_PROG_LN_S
 mkinstalldirs="`cd $ac_aux_dir && ${PWDCMD-pwd}`/mkinstalldirs"
 AC_SUBST(mkinstalldirs)
 
+dnl Default to --enable-multilib
+AC_ARG_ENABLE(multilib,
+[  --enable-multilib       build many library versions (default)],
+[case "${enableval}" in
+  yes) multilib=yes ;;
+  no)  multilib=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for multilib option) ;;
+ esac], [test -z "$with_target_subdir" && multilib=no || multilib=yes])dnl
+
 AC_ARG_WITH(cross-host,
-  AS_HELP_STRING([--with-cross-host=HOST],
-                 [configure with a cross compiler from HOST]))
+[  --with-cross-host=HOST  configuring with a cross compiler])
 
 AC_ARG_WITH(newlib,
   AS_HELP_STRING([--with-newlib],
@@ -147,16 +152,17 @@ AM_CONDITIONAL(JAVA_MAINTAINER_MODE, test "$enable_java_maintainer_mode" = yes)
 # It may not be safe to run linking tests in AC_PROG_CC/AC_PROG_CXX.
 GCC_NO_EXECUTABLES
 
+AM_INIT_AUTOMAKE([no-dist 1.9.0])
+
 # For libstdc++-v3, -fno-builtin must be present here so that a
 # non-conflicting form of std::exit can be guessed by AC_PROG_CXX, and
 # used in later tests.  This may not be necessary in libjava; I don't know.
+
 save_CXXFLAGS="$CXXFLAGS"
 CXXFLAGS="$CXXFLAGS -fno-builtin"
 AC_PROG_CC
 AC_PROG_CXX
 CXXFLAGS="$save_CXXFLAGS"
-
-AM_INIT_AUTOMAKE([no-dist 1.9.0])
 
 AC_CHECK_TOOL(AS, as)
 AC_CHECK_TOOL(LD, ld)
@@ -245,11 +251,6 @@ AC_SUBST(LIBGCJ_SUBLIB_CORE_EXTRA_DEPS)
 AC_SUBST(LIBGCJ_LD_SYMBOLIC)
 AC_SUBST(LIBGCJ_LD_SYMBOLIC_FUNCTIONS)
 AC_SUBST(LIBGCJ_LD_EXPORT_ALL)
-
-# Only use libltdl for non-newlib builds.
-if test "x${with_newlib}" = "x" || test "x${with_newlib}" = "xno"; then
-   AC_LTDL_SHLIBPATH
-fi
 
 AC_CONFIG_HEADERS([include/config.h gcj/libgcj-config.h])
 
@@ -497,8 +498,6 @@ test -f libgcj.spec || touch libgcj.spec
 
 # Set up to configure Classpath.
 # FIXME: no supported way to pass args in autoconf.
-# Disable tool wrappers to avoid ltdl.h configure check.
-ac_configure_args="$ac_configure_args --disable-tool-wrappers"
 ac_configure_args="$ac_configure_args --disable-load-library"
 ac_configure_args="$ac_configure_args --${LIBGCJDEBUG}-debug"
 ac_configure_args="$ac_configure_args --enable-default-toolkit=$TOOLKIT"
@@ -548,27 +547,20 @@ dnl --with-javah=$GCJH
 dnl gtk-cairo -- just export here...
 dnl --enable-regen-headers?
 
-# Only use libltdl for non-newlib builds.
-if test "x${with_newlib}" = "x" || test "x${with_newlib}" = "xno"; then
-   AC_LIBLTDL_CONVENIENCE
-   AC_LIBTOOL_DLOPEN
-   DIRLTDL=libltdl
-   AC_DEFINE(USE_LTDL, 1, [Define if libltdl is in use.])
-   # Sigh.  Libtool's macro doesn't do the right thing.
-   INCLTDL="-I\$(top_srcdir)/libltdl $INCLTDL"
-   # FIXME: this is a hack.
-   sub_auxdir="`cd $ac_aux_dir && ${PWDCMD-pwd}`"
-   ac_configure_args="$ac_configure_args --with-auxdir=$sub_auxdir"
+LT_INIT()
+AC_CHECK_HEADERS(ltdl.h)
+if test "$ac_cv_header_ltdl_h" = "no"; then
+  AC_DEFINE(USE_LTDL, 0, [Define if libltdl is in use.])
+  AC_MSG_ERROR(cannot find ltdl.h)
+else
+  AC_DEFINE(USE_LTDL, 1, [Define if libltdl is in use.])
 fi
-AC_SUBST(INCLTDL)
-AC_SUBST(LIBLTDL)
-AC_SUBST(DIRLTDL)
-AC_PROG_LIBTOOL
+
 ACX_LT_HOST_FLAGS
 AM_PROG_GCJ
 AM_PROG_CC_C_O
 
-AC_CONFIG_SUBDIRS(classpath libltdl)
+AC_CONFIG_SUBDIRS(classpath)
 
 # The -no-testsuite modules omit the test subdir.
 AM_CONDITIONAL(TESTSUBDIR, test -d $srcdir/testsuite)
@@ -726,7 +718,7 @@ if test "$enable_java_net" = no; then
 fi
 
 # See if the user wants to configure without libffi.  Some
-# architectures don't support it, and default values are set in 
+# architectures don't support it, and default values are set in
 # configure.host.
 AC_ARG_WITH(libffi,
   AS_HELP_STRING([--without-libffi],
@@ -743,6 +735,7 @@ if test "$with_libffi" != no; then
 fi
 AC_SUBST(LIBFFI)
 AC_SUBST(LIBFFIINCS)
+AM_CONDITIONAL(USE_LIBFFI, test "$with_libffi" != "no")
 
 # See if the user wants to disable JVMPI support.
 AC_ARG_ENABLE(jvmpi,
@@ -918,7 +911,7 @@ esac
 AC_CACHE_CHECK([for --no-merge-exidx-entries], [libgcj_cv_exidx],
   [saved_ldflags="$LDFLAGS"
    LDFLAGS="${LDFLAGS} -Wl,--no-merge-exidx-entries"
-   AC_LINK_IFELSE([int main(void){ return 0;} ],
+   AC_LINK_IFELSE([AC_LANG_SOURCE([int main(void){ return 0;} ])],
 		      [eval "libgcj_cv_exidx=yes"],
 		      [eval "libgcj_cv_exidx=no"])
    LDFLAGS="${saved_ldflags}"]
@@ -935,48 +928,173 @@ AC_SUBST(LIBMATHSPEC)
 
 AC_SUBST(LIBGCJTESTSPEC)
 
-# Allow the GC to be disabled.  Can be useful when debugging.
-AC_MSG_CHECKING([for garbage collector to use])
+AC_MSG_CHECKING([if garbage collector is enabled])
 AC_ARG_ENABLE(java-gc,
-  AS_HELP_STRING([--enable-java-gc=TYPE],
-                 [choose garbage collector (default is boehm)]),
-  [GC=$enableval],
-  [GC=boehm])
-GCLIBS=
-GCINCS=
-GCDEPS=
-GCSPEC=
-JC1GCSPEC=
-GCTESTSPEC=
-case "$GC" in
- boehm)
-    AC_MSG_RESULT(boehm)
-    GCLIBS=../boehm-gc/libgcjgc_convenience.la
-    JC1GCSPEC='-fuse-boehm-gc'
-    GCTESTSPEC="-L`${PWDCMD-pwd}`/../boehm-gc/.libs -rpath `${PWDCMD-pwd}`/../boehm-gc/.libs"
-    GCINCS='-I$(top_srcdir)/../boehm-gc/include -I../boehm-gc/include'
-    GCOBJS=boehm.lo    
-    GCHDR=boehm-gc.h
-    # The POSIX thread support needs to know this.
-    AC_DEFINE(HAVE_BOEHM_GC, 1, [Define if Boehm GC in use.])
+[AS_HELP_STRING([[--enable-java-gc[=ARG]]],
+    [enable the use of the bdw-gc garbage collector with libjava @<:@ARG={default,yes,no}@:>@])],
+[USE_GC=$enableval],
+[USE_GC=yes])
+AC_ARG_WITH([target-bdw-gc],
+[AS_HELP_STRING([--with-target-bdw-gc=PATHLIST],
+    [specify prefix directory for installed bdw-gc package.
+     Equivalent to --with-target-bdw-gc-include=PATH/include
+     plus --with-target-bdw-gc-lib=PATH/lib])])
+AC_ARG_WITH([target-bdw-gc-include],
+[AS_HELP_STRING([--with-target-bdw-gc-include=PATHLIST],
+    [specify directories for installed bdw-gc include files])])
+AC_ARG_WITH([target-bdw-gc-lib],
+[AS_HELP_STRING([--with-target-bdw-gc-lib=PATHLIST],
+    [specify directories for installed bdw-gc library])])
+
+case "${USE_GC}" in
+no)
+  use_bdw_gc=no
+  ;;
+yes|default)
+  AC_MSG_CHECKING([for bdw garbage collector])
+  if test "x$with_target_bdw_gc$with_target_bdw_gc_include$with_target_bdw_gc_lib" = x; then
+    dnl no bdw-gw options, assuming bdw-gc in default locations
+    BDW_GC_CFLAGS=
+    GCLIBS="-lgc"
+  else
+    dnl bdw-gw options passed by configure flags
+    if test "x$with_target_bdw_gc_include" = x && test "x$with_target_bdw_gc_lib" != x; then
+      AC_MSG_ERROR([found --with-target-bdw-gc-lib but --with-target-bdw-gc-include missing])
+    elif test "x$with_target_bdw_gc_include" != x && test "x$with_target_bdw_gc_lib" = x; then
+      AC_MSG_ERROR([found --with-target-bdw-gc-include but --with-target-bdw-gc-lib missing])
+    else
+      AC_MSG_RESULT([using paths configured with --with-target-bdw-gc options])
+    fi
+    mldir=`${CC-gcc} --print-multi-directory 2>/dev/null`
+    bdw_val=
+    if test "x$with_target_bdw_gc" != x; then
+      for i in `echo $with_target_bdw_gc | tr ',' ' '`; do
+        case "$i" in
+          *=*) sd=${i%%=*}; d=${i#*=} ;;
+          *) sd=.; d=$i ;;
+        esac
+        if test "$mldir" = "$sd"; then
+          bdw_val=$d
+        fi
+      done
+      if test "x$bdw_val" = x; then
+        AC_MSG_ERROR([no multilib path ($mldir) found in --with-target-bdw-gc])
+      fi
+      bdw_inc_dir="$bdw_val/include"
+      bdw_lib_dir="$bdw_val/lib"
+    fi
+    bdw_val=
+    if test "x$with_target_bdw_gc_include" != x; then
+      for i in `echo $with_target_bdw_gc_include | tr ',' ' '`; do
+        case "$i" in
+          *=*) sd=${i%%=*}; d=${i#*=} ;;
+          *) sd=.; d=$i; fallback=$i ;;
+        esac
+        if test "$mldir" = "$sd"; then
+          bdw_val=$d
+        fi
+      done
+      if test "x$bdw_val" = x && test "x$bdw_inc_dir" = x && test "x$fallback" != x; then
+        bdw_inc_dir="$fallback"
+      elif test "x$bdw_val" = x; then
+        AC_MSG_ERROR([no multilib path ($mldir) found in --with-target-bdw-gc-include])
+      else
+        bdw_inc_dir="$bdw_val"
+      fi
+    fi
+    bdw_val=
+    if test "x$with_target_bdw_gc_lib" != x; then
+      for i in `echo $with_target_bdw_gc_lib | tr ',' ' '`; do
+        case "$i" in
+          *=*) sd=${i%%=*}; d=${i#*=} ;;
+          *) sd=.; d=$i ;;
+        esac
+        if test "$mldir" = "$sd"; then
+          bdw_val=$d
+        fi
+      done
+      if test "x$bdw_val" = x; then
+        AC_MSG_ERROR([no multilib path ($mldir) found in --with-target-bdw-gc-lib])
+      fi
+      bdw_lib_dir="$bdw_val"
+    fi
+    if test "x$bdw_inc_dir" = x; then
+      AC_MSG_ERROR([no multilib path ($mldir) found in --with-target-bdw-gc-include])
+    fi
+    if test "x$bdw_lib_dir" = x; then
+      AC_MSG_ERROR([no multilib path ($mldir) found in --with-target-bdw-gc-lib])
+    fi
+    BDW_GC_CFLAGS="-I$bdw_inc_dir"
+    if test -f $bdw_lib_dir/libgc.la; then
+      GCLIBS="$bdw_lib_dir/libgc.la"
+    else
+      GCLIBS="-L$bdw_lib_dir -lgc"
+    fi
+    AC_MSG_RESULT([found])
+  fi
+
+  case "$GCLIBS" in
+  *libgc.la)
+    use_bdw_gc=yes
     ;;
- no)
-    AC_MSG_RESULT(none)
-    GCHDR=no-gc.h
-    ;;
- *)
-    AC_MSG_ERROR([unrecognized collector "$GC"])
-    ;;
+  *)
+    AC_MSG_CHECKING([for system boehm-gc])
+    save_CFLAGS=$CFLAGS
+    save_LIBS=$LIBS
+    CFLAGS="$CFLAGS $BDW_GC_CFLAGS"
+    LIBS="$LIBS $GCLIBS"
+    dnl the link test is not good enough for ARM32 multilib detection,
+    dnl first check to link, then to run
+    AC_LINK_IFELSE(
+      [AC_LANG_PROGRAM([#include <gc/gc.h>],[GC_init()])],
+      [
+        AC_RUN_IFELSE([AC_LANG_SOURCE([[
+          #include <gc/gc.h>
+          int main() {
+            GC_init();
+            return 0;
+          }
+          ]])],
+          [system_bdw_gc_found=yes],
+          [system_bdw_gc_found=no],
+          dnl assume no system boehm-gc for cross builds ...
+          [system_bdw_gc_found=no]
+        )
+      ],
+      [system_bdw_gc_found=no])
+    CFLAGS=$save_CFLAGS
+    LIBS=$save_LIBS
+    if test x$enable_objc_gc = xauto && test x$system_bdw_gc_found = xno; then
+      AC_MSG_WARN([system bdw-gc not found, not building libobjc_gc])
+      use_bdw_gc=no
+    elif test x$enable_objc_gc = xyes && test x$system_bdw_gc_found = xno; then
+      AC_MSG_ERROR([system bdw-gc required but not found])
+    else
+      use_bdw_gc=yes
+      AC_MSG_RESULT([found])
+    fi
+  esac
 esac
+
+if test "$use_bdw_gc" = no; then
+  GCLIBS=
+  GCINCS=
+  JC1GCSPEC=
+  GCHDR=no-gc.h
+else
+  GCINCS=$BDW_GC_CFLAGS
+  GCLIBS=$GCLIBS
+  GCHDR=boehm-gc.h
+  # The POSIX thread support needs to know this.
+  AC_DEFINE(HAVE_BOEHM_GC, 1, [Define if Boehm GC in use.])
+fi
+
 AC_SUBST(GCLIBS)
 AC_SUBST(GCINCS)
-AC_SUBST(GCDEPS)
-AC_SUBST(GCSPEC)
 AC_SUBST(JC1GCSPEC)
-AC_SUBST(GCTESTSPEC)
 AC_CONFIG_LINKS(include/java-gc.h:include/$GCHDR)
-AM_CONDITIONAL(USING_BOEHMGC, test "$GC" = boehm)
-AM_CONDITIONAL(USING_NOGC, test "$GC" = no)
+AM_CONDITIONAL(USING_BOEHMGC, test "$USE_GC" = yes)
+AM_CONDITIONAL(USING_NOGC, test "$USE_GC" = no)
 
 
 AC_MSG_CHECKING([for thread model used by GCC])
@@ -1060,7 +1178,7 @@ case "$THREADS" in
 
     # If we're using the Boehm GC, then we happen to know that it
     # defines _REENTRANT, so we don't bother.  Eww.
-    if test "$GC" != boehm; then
+    if test "$USE_GC" = no; then
        AC_DEFINE(_REENTRANT, 1, [Required define if using POSIX threads])
     fi
     AC_DEFINE(_POSIX_PTHREAD_SEMANTICS, 1, [Required define if using POSIX threads])
@@ -1215,12 +1333,12 @@ else
 	AC_CACHE_CHECK([whether gethostbyname_r declaration requires -D_REENTRANT],
 	[libjava_cv_gethostbyname_r_needs_reentrant],
 	[ AC_LANG_PUSH(C++)
-	  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netdb.h>]],
+	  AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <netdb.h>]],
 	    [[gethostbyname_r("", 0, 0);]])],
 	    [libjava_cv_gethostbyname_r_needs_reentrant=no], [dnl
 		CPPFLAGS_SAVE="$CPPFLAGS"
 		CPPFLAGS="$CPPFLAGS -D_REENTRANT"
-		AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netdb.h>]], [[gethostbyname_r("", 0, 0);]])],
+		AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <netdb.h>]], [[gethostbyname_r("", 0, 0);]])],
 		    [libjava_cv_gethostbyname_r_needs_reentrant=yes],
 		    [libjava_cv_gethostbyname_r_needs_reentrant=fail])
 		CPPFLAGS="$CPPFLAGS_SAVE"
@@ -1235,7 +1353,7 @@ else
 
      AC_CACHE_CHECK([for struct hostent_data],
 	[libjava_cv_struct_hostent_data], [dnl
-	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+	AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
 #if GETHOSTBYNAME_R_NEEDS_REENTRANT && !defined(_REENTRANT)
 # define _REENTRANT 1
 #endif
@@ -1308,11 +1426,11 @@ else
 
       # We can save a little space at runtime if the mutex has m_count
       # or __m_count.  This is a nice hack for Linux.
-      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <pthread.h>]], [[
+      AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <pthread.h>]], [[
           extern pthread_mutex_t *mutex; int q = mutex->m_count;
         ]])], AC_DEFINE(PTHREAD_MUTEX_HAVE_M_COUNT, 1,
              [Define if pthread_mutex_t has m_count member.]), [
-	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <pthread.h>]], [[
+	AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <pthread.h>]], [[
 	    extern pthread_mutex_t *mutex; int q = mutex->__m_count;
 	  ]])], AC_DEFINE(PTHREAD_MUTEX_HAVE___M_COUNT, 1,
             [Define if pthread_mutex_t has __m_count member.]))])
@@ -1415,7 +1533,7 @@ else
 
    # On Solaris, and maybe other architectures, the Boehm collector
    # requires -ldl.
-   if test "$GC" = boehm; then
+   if test "$USE_GC" != no; then
       case "${host}" in
 	  *-*-darwin*)
 	    ;;
@@ -1586,12 +1704,12 @@ AC_CHECK_TYPE([magic_t], [
 #endif])
 
 AC_MSG_CHECKING([for in_addr_t])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
-#if STDC_HEADERS
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <sys/types.h>
+#ifdef STDC_HEADERS
 #include <stdlib.h>
 #include <stddef.h>
 #endif
-#if HAVE_NETINET_IN_H
+#ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif]], [[in_addr_t foo;]])],
   [AC_DEFINE(HAVE_IN_ADDR_T, 1,
@@ -1600,28 +1718,28 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
   [AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING([whether struct ip_mreq is in netinet/in.h])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netinet/in.h>]], [[struct ip_mreq mreq;]])],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <netinet/in.h>]], [[struct ip_mreq mreq;]])],
   [AC_DEFINE(HAVE_STRUCT_IP_MREQ, 1,
      [Define if struct ip_mreq is defined in netinet/in.h.])
    AC_MSG_RESULT(yes)],
   [AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING([whether struct ipv6_mreq is in netinet/in.h])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netinet/in.h>]], [[struct ipv6_mreq mreq6;]])],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <netinet/in.h>]], [[struct ipv6_mreq mreq6;]])],
   [AC_DEFINE(HAVE_STRUCT_IPV6_MREQ, 1,
      [Define if struct ipv6_mreq is defined in netinet/in.h.])
    AC_MSG_RESULT(yes)],
   [AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING([whether struct sockaddr_in6 is in netinet/in.h])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netinet/in.h>]], [[struct sockaddr_in6 addr6;]])],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <netinet/in.h>]], [[struct sockaddr_in6 addr6;]])],
   [AC_DEFINE(HAVE_INET6, 1,
      [Define if inet6 structures are defined in netinet/in.h.])
    AC_MSG_RESULT(yes)],
   [AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING([for socklen_t in sys/socket.h])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#define _POSIX_PII_SOCKET
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#define _POSIX_PII_SOCKET
 #include <sys/types.h>
 #include <sys/socket.h>]], [[socklen_t x = 5;]])],
   [AC_DEFINE(HAVE_SOCKLEN_T, 1, [Define it socklen_t typedef is in sys/socket.h.])
@@ -1629,7 +1747,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#define _POSIX_PII_SOCKET
   [AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING([for tm_gmtoff in struct tm])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <time.h>]], [[struct tm tim; tim.tm_gmtoff = 0;]])],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <time.h>]], [[struct tm tim; tim.tm_gmtoff = 0;]])],
   [AC_DEFINE(STRUCT_TM_HAS_GMTOFF, 1, [Define if struct tm has tm_gmtoff field.])
    AC_MSG_RESULT(yes)],
   [AC_MSG_RESULT(no)
@@ -1638,13 +1756,13 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <time.h>]], [[struct tm tim; tim.t
    dnl when cross-compiling.  So instead we make an assumption that
    dnl the header file will mention timezone if it exists.
    dnl Don't find the win32 function timezone
-   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <time.h>]], [[void i(){long z2 = 2*timezone;}]])],
+   AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <time.h>]], [[void i(){long z2 = 2*timezone;}]])],
      [AC_DEFINE(HAVE_TIMEZONE, 1, [Define if global 'timezone' exists.])
       AC_MSG_RESULT(yes)],
      [AC_MSG_RESULT(no)
        AC_MSG_CHECKING([for global _timezone variable])
        dnl FIXME: As above, don't want link check
-       AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <time.h>]], [[long z2 = _timezone;]])],
+       AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <time.h>]], [[long z2 = _timezone;]])],
          [AC_DEFINE(HAVE_UNDERSCORE_TIMEZONE, 1,
             [Define if your platform has the global _timezone variable.])
           AC_MSG_RESULT(yes)],
@@ -1732,12 +1850,6 @@ fi
 
 AC_CONFIG_LINKS(include/java-signal.h:$SIGNAL_HANDLER
 		include/java-signal-aux.h:$SIGNAL_HANDLER_AUX)
-
-if test "${multilib}" = "yes"; then
-  multilib_arg="--enable-multilib"
-else
-  multilib_arg=
-fi
 
 # See if we support thread-local storage.
 GCC_CHECK_TLS

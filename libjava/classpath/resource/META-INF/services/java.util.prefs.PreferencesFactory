@@ -1,1 +1,1 @@
-gnu.java.util.prefs.GConfBasedFactory
+gnu.java.util.prefs.FileBasedFactory

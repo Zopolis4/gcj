@@ -6,12 +6,16 @@ vmdirs=`echo "@vm_classes@" | sed 's%:% %g'`
 destMetaDir=`pwd`/META-INF
 destResDir=`pwd`
 
+set -e
+
+mkdir_p="@MKDIR_P@"
+
 for p in ${vmdirs}; do
 	if test -d $p/META-INF; then
 		(cd $p/META-INF; 
 		 dirs=`find . -name "CVS" -prune -o -type d -print`;
 		 for u in ${dirs}; do
-			 @mkdir_p@ ${destMetaDir}/${u};
+			 $mkdir_p ${destMetaDir}/${u};
 		 done;
 		 files=`find . -name "CVS" -prune -o -name "*.in" -prune -o -type f -print`;
 		 for u in ${files}; do
@@ -31,7 +35,7 @@ for p in ${vmdirs}; do
   	  resnewdirs=`echo ${resdirs} | uniq`;
 
   	  for u in ${resnewdirs}; do
-  		  @mkdir_p@ ${destResDir}/${u};
+		  $mkdir_p ${destResDir}/${u};
   	  done
   
 	  for f in ${resfiles}; do

@@ -739,7 +739,7 @@ struct GTY(()) lang_decl_func {
   int max_locals;
   int max_stack;
   int arg_slot_count;
-  source_location last_line;	/* End line number for a function decl */
+  location_t last_line;	/* End line number for a function decl */
   vec<tree, va_gc> *throws_list;	/* Exception specified by `throws' */
   tree exc_obj;			/* Decl holding the exception object.  */
 
@@ -1339,7 +1339,7 @@ extern tree *type_map;
 
 /* If FUNCTION_TYPE or METHOD_TYPE: cache for build_java_argument_signature. */
 #define TYPE_ARGUMENT_SIGNATURE(TYPE) \
-  (TYPE_MINVAL (TREE_CHECK2 (TYPE, FUNCTION_TYPE, METHOD_TYPE)))
+  (TYPE_MIN_VALUE (TREE_CHECK2 (TYPE, FUNCTION_TYPE, METHOD_TYPE)))
 
 /* Given an array type, give the type of the elements. */
 /* FIXME this use of TREE_TYPE conflicts with something or other. */

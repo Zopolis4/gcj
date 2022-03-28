@@ -136,10 +136,6 @@ libgfortran/configure: libgfortran/configure.ac libgfortran/aclocal.m4
 libjava/aclocal.m4: libjava/configure.ac
 libjava/Makefile.in: libjava/Makefile.am libjava/configure.ac libjava/aclocal.m4
 libjava/configure: libjava/configure.ac libjava/aclocal.m4
-libjava/libltdl/aclocal.m4: libjava/libltdl/configure.ac libjava/libltdl/acinclude.m4
-libjava/libltdl/Makefile.in: libjava/libltdl/Makefile.am libjava/libltdl/configure.ac libjava/libltdl/aclocal.m4
-libjava/libltdl/configure: libjava/libltdl/configure.ac libjava/libltdl/aclocal.m4
-libjava/libltdl/config-h.in: libjava/libltdl/configure.ac libjava/libltdl/aclocal.m4
 libcody/configure: libcody/configure.ac libcody/config.m4
 libcpp/aclocal.m4: libcpp/configure.ac
 libcpp/Makefile.in: libcpp/configure.ac libcpp/aclocal.m4

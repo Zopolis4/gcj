@@ -86,18 +86,18 @@ endif # USE_PREBUILT_GLIBJ_ZIP
 resources: copy-vmresources.sh
 	@list=`cd $(top_srcdir)/resource && $(FIND) gnu java javax org -name \*\.properties -print -o -name \*\.css -print`; for p in $$list; do \
           dirname=`dirname $$p`; \
-          if ! test -d "$$dirname"; then @mkdir_p@ "$$dirname"; fi; \
+          if ! test -d "$$dirname"; then $(MKDIR_P) "$$dirname"; fi; \
 	  cp $(top_srcdir)/resource/$$p $$p; \
 	done
 	@list=`cd $(top_srcdir)/resource && $(FIND) META-INF -name CVS -prune -o -name .svn -prune -o -name \*\.in -prune -o -type f -print`; for p in $$list; do \
           dirname=`dirname $$p`; \
-          if ! test -d "$$dirname"; then @mkdir_p@ "$$dirname"; fi; \
+          if ! test -d "$$dirname"; then $(MKDIR_P) "$$dirname"; fi; \
 	  cp $(top_srcdir)/resource/$$p $$p; \
 	done
 	@$(SHELL) ./copy-vmresources.sh
 	@list=`cd $(top_srcdir) && $(FIND) gnu/javax/swing/plaf/gtk/icons -name *.png -type f -print`; for p in $$list; do \
           dirname=`dirname $$p`; \
-          if ! test -d "$$dirname"; then @mkdir_p@ "$$dirname"; fi; \
+          if ! test -d "$$dirname"; then $(MKDIR_P) "$$dirname"; fi; \
 	  cp $(top_srcdir)/$$p $$p; \
 	done
 	touch resources
@@ -105,7 +105,7 @@ resources: copy-vmresources.sh
 classes: genclasses
 
 $(top_builddir)/gnu/java/locale/LocaleData.java: $(top_srcdir)/scripts/generate-locale-list.sh 
-	@mkdir_p@ $(top_builddir)/gnu/java/locale
+	$(MKDIR_P) $(top_builddir)/gnu/java/locale
 	$(top_srcdir)/scripts/generate-locale-list.sh > $(top_builddir)/gnu/java/locale/LocaleData.java
 
 genclasses: gen-classlist.sh standard.omit $(top_builddir)/gnu/java/locale/LocaleData.java gen-xpath-parser
@@ -165,7 +165,7 @@ clean-local:
 	-rm -rf lists
 
 dist-hook:
-	@mkdir_p@ $(distdir)
+	$(MKDIR_P) $(distdir)
 	cp -pdfR $(top_srcdir)/gnu $(top_srcdir)/java $(top_srcdir)/javax $(top_srcdir)/org $(top_srcdir)/sun $(top_srcdir)/vm $(top_srcdir)/resource $(distdir)/..
 # Delete not wanted files.
 	$(FIND) $(distdir)/../gnu $(distdir)/../java $(distdir)/../javax $(distdir)/../org $(distdir)/../sun $(distdir)/../vm $(distdir)/../resource -name CVS -print | xargs rm -fr

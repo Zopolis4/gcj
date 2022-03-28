@@ -341,7 +341,7 @@ java_replace_references (tree *tp, int *walk_subtrees,
 {
   if (TREE_CODE (*tp) == MODIFY_EXPR)
     {
-      source_location loc = EXPR_LOCATION (*tp);
+      location_t loc = EXPR_LOCATION (*tp);
       tree lhs = TREE_OPERAND (*tp, 0);
       /* This is specific to the bytecode compiler.  If a variable has
 	 LOCAL_SLOT_P set, replace an assignment to it with an assignment
@@ -416,7 +416,7 @@ struct GTY(())
     unsigned binding_depth;
 
     /* The location at which this level began.  */
-    source_location loc;
+    location_t loc;
   };
 
 #define NULL_BINDING_LEVEL (struct binding_level *) NULL
@@ -481,7 +481,8 @@ push_promoted_type (const char *name, tree actual_type)
   TYPE_MAX_VALUE (type) = copy_node (in_max);
   TREE_TYPE (TYPE_MAX_VALUE (type)) = type;
   TYPE_PRECISION (type) = TYPE_PRECISION (int_type_node);
-  TYPE_STRING_FLAG (type) = TYPE_STRING_FLAG (actual_type);
+  if (TREE_CODE (type) == ARRAY_TYPE || TREE_CODE (type) == INTEGER_TYPE)
+    TYPE_STRING_FLAG (type) = TYPE_STRING_FLAG (actual_type);
   layout_type (type);
   pushdecl (build_decl (input_location,
 			TYPE_DECL, get_identifier (name), type));
@@ -795,7 +796,7 @@ java_init_decl_processing (void)
   if (! flag_hash_synchronization)
     PUSH_FIELD (input_location, object_type_node, field, "sync_info",
 		build_pointer_type (object_type_node));
-  for (t = TYPE_FIELDS (object_type_node); t != NULL_TREE; t = DECL_CHAIN (t))
+  for (tree t = TYPE_FIELDS (object_type_node); t != NULL_TREE; t = DECL_CHAIN (t))
     FIELD_PRIVATE (t) = 1;
   FINISH_RECORD (object_type_node);
 
@@ -877,7 +878,7 @@ java_init_decl_processing (void)
   PUSH_FIELD (input_location, class_type_node, field, "engine", ptr_type_node);
   PUSH_FIELD (input_location,
 	      class_type_node, field, "reflection_data", ptr_type_node);
-  for (t = TYPE_FIELDS (class_type_node);  t != NULL_TREE;  t = DECL_CHAIN (t))
+  for (tree t = TYPE_FIELDS (class_type_node);  t != NULL_TREE;  t = DECL_CHAIN (t))
     FIELD_PRIVATE (t) = 1;
   push_super_field (class_type_node, object_type_node);
 
@@ -1617,7 +1618,7 @@ force_poplevels (int start_pc)
   while (current_binding_level->start_pc > start_pc)
     {
       if (pedantic && current_binding_level->start_pc > start_pc)
-	warning (0, "In %+D: overlapped variable and exception ranges at %d",
+	warning (0, "In %<%+D:%> overlapped variable and exception ranges at %d",
                  current_function_decl,
 		 current_binding_level->start_pc);
       poplevel (1, 0, 0);
@@ -1938,13 +1939,11 @@ java_mark_cni_decl_local (tree decl)
 void
 java_mark_class_local (tree klass)
 {
-  tree t;
-
-  for (t = TYPE_FIELDS (klass); t ; t = DECL_CHAIN (t))
+  for (tree t = TYPE_FIELDS (klass); t ; t = DECL_CHAIN (t))
     if (FIELD_STATIC (t))
       java_mark_decl_local (t);
 
-  for (t = TYPE_METHODS (klass); t ; t = DECL_CHAIN (t))
+  for (tree t = TYPE_FIELDS (klass); t ; t = DECL_CHAIN (t))
     if (!METHOD_ABSTRACT (t))
       {
 	if (METHOD_NATIVE (t) && !flag_jni)

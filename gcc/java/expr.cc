@@ -1299,8 +1299,8 @@ expand_java_return (tree type)
 	 The whole if expression just goes away if INT_TYPE_SIZE < 32
 	 is false. */
       if (INT_TYPE_SIZE < 32
-	  && (GET_MODE_SIZE (TYPE_MODE (TREE_TYPE (res)))
-	      < GET_MODE_SIZE (TYPE_MODE (type))))
+	  && known_lt (GET_MODE_SIZE (TYPE_MODE (TREE_TYPE (res))),
+	               GET_MODE_SIZE (TYPE_MODE (type))))
 	retval = build1 (NOP_EXPR, TREE_TYPE (res), retval);
       
       TREE_SIDE_EFFECTS (retval) = 1;
@@ -1956,7 +1956,7 @@ pop_arguments (tree method_type)
   return args;
 }
 
-/* Attach to PTR (a block) the declaration found in ENTRY. */
+/* Attach to void * (a block) the declaration found in ENTRY. */
 
 int
 attach_init_test_initialization_flags (treetreehash_entry **slot, tree block)
@@ -2239,7 +2239,7 @@ build_known_method_ref (tree method, tree method_type ATTRIBUTE_UNUSED,
       */
 
       int method_index = 0;
-      tree meth, ref;
+      tree ref;
 
       /* The method might actually be declared in some superclass, so
 	 we have to use its class context, not the caller's notion of
@@ -2254,7 +2254,7 @@ build_known_method_ref (tree method, tree method_type ATTRIBUTE_UNUSED,
       ref = build3 (COMPONENT_REF, method_ptr_type_node, ref,
 		    lookup_field (&class_type_node, methods_ident),
 		    NULL_TREE);
-      for (meth = TYPE_METHODS (self_type);
+      for (tree meth = TYPE_FIELDS (self_type);
 	   ; meth = DECL_CHAIN (meth))
 	{
 	  if (method == meth)

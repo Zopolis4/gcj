@@ -34,6 +34,7 @@ The Free Software Foundation is independent of Sun Microsystems, Inc.  */
 #include "tree.h"
 #include "stringpool.h"
 #include "expmed.h"
+#include "memmodel.h"
 #include "optabs.h"
 #include "fold-const.h"
 #include "stor-layout.h"
@@ -348,7 +349,7 @@ compareAndSwapLong_builtin (tree method_return_type ATTRIBUTE_UNUSED,
      versions.  */
   if (can_compare_and_swap_p (mode,
 			      (flag_use_atomic_builtins
-			       && GET_MODE_SIZE (mode) <= UNITS_PER_WORD)))
+			       && known_le (GET_MODE_SIZE (mode), UNITS_PER_WORD))))
     {
       tree addr, stmt;
       enum built_in_function fncode = BUILT_IN_SYNC_BOOL_COMPARE_AND_SWAP_8;
@@ -472,8 +473,7 @@ define_builtin (enum built_in_function val,
   TREE_PUBLIC (decl) = 1;
   SET_DECL_ASSEMBLER_NAME (decl, get_identifier (libname));
   pushdecl (decl);
-  DECL_BUILT_IN_CLASS (decl) = BUILT_IN_NORMAL;
-  DECL_FUNCTION_CODE (decl) = val;
+  set_decl_built_in_function (decl, BUILT_IN_NORMAL, val);
   set_call_expr_flags (decl, flags);
 
   set_builtin_decl (val, decl, true);

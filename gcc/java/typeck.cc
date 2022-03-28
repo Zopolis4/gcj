@@ -347,8 +347,8 @@ promote_type (tree type)
     }
 }
 
-/* Parse a signature string, starting at *PTR and ending at LIMIT.
-   Return the seen TREE_TYPE, updating *PTR. */
+/* Parse a signature string, starting at *ptr and ending at LIMIT.
+   Return the seen TREE_TYPE, updating *ptr. */
 
 static tree
 parse_signature_type (const unsigned char **ptr, const unsigned char *limit)
@@ -640,8 +640,7 @@ static tree
 shallow_find_method (tree searched_class, int flags, tree method_name, 
 	     tree signature, tree (*signature_builder) (tree))
 {
-  tree method;
-  for (method = TYPE_METHODS (searched_class);
+  for (tree method = TYPE_FIELDS (searched_class);
        method != NULL_TREE;  method = DECL_CHAIN (method))
     {
       tree method_sig = (*signature_builder) (TREE_TYPE (method));
@@ -776,7 +775,7 @@ lookup_do (tree searched_class, int flags, tree method_name,
 tree
 lookup_java_constructor (tree clas, tree method_signature)
 {
-  tree method = TYPE_METHODS (clas);
+  tree method = TYPE_FIELDS (clas);
   for ( ; method != NULL_TREE;  method = DECL_CHAIN (method))
     {
       tree method_sig = build_java_signature (TREE_TYPE (method));

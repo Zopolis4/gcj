@@ -2,13 +2,13 @@
 
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
-ACLOCAL_AMFLAGS = -I . -I .. -I ../config -I libltdl
+ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 
 # May be used by various substitution variables.
 gcc_version := $(shell cat $(top_srcdir)/../gcc/BASE-VER)
 export gcc_version
 
-SUBDIRS = $(DIRLTDL) gcj include classpath
+SUBDIRS = gcj include classpath
 if TESTSUBDIR
 SUBDIRS += testsuite
 endif
@@ -411,7 +411,7 @@ AM_CPPFLAGS = -I$(top_srcdir) \
 	-I$(top_srcdir)/classpath/include \
 	-Iclasspath/include \
 	-I$(top_srcdir)/classpath/native/fdlibm \
-	$(GCINCS) $(THREADINCS) $(INCLTDL) \
+	$(GCINCS) $(THREADINCS) \
 	$(LIBGCC_UNWIND_INCLUDE) $(ZINCS) $(LIBFFIINCS)
 
 BOOTCLASSPATH = $(srcdir)/classpath/lib
@@ -492,7 +492,7 @@ xlib_nat_files = $(xlib_nat_source_files:.cc=.lo)
 # certain linuxthread functions get linked:
 ## The mysterious backslash in the grep pattern is consumed by make.
 libgcj_la_LDFLAGS = -rpath $(toolexeclibdir) $(THREADLDFLAGS) $(extra_ldflags) $(THREADLIBS) \
-	$(LIBLTDL) $(SYS_ZLIBS) $(LIBJAVA_LDFLAGS_NOUNDEF) \
+	$(SYS_ZLIBS) $(LIBJAVA_LDFLAGS_NOUNDEF) \
 	-version-info `grep -v '^\#' $(srcdir)/libtool-version` \
 	$(LIBGCJ_LD_SYMBOLIC_FUNCTIONS) $(LIBGCJ_LD_EXPORT_ALL)
 libgcj_la_LIBADD = \
@@ -507,7 +507,7 @@ libgcj_la_DEPENDENCIES = libgcj-$(gcc_version).jar \
 	java/lang/Class.lo \
 	java/process-$(PLATFORM).lo \
 	$(ALL_PACKAGE_SOURCE_FILES_LO) \
-	$(LIBLTDL) $(libgcj_la_LIBADD) \
+	$(libgcj_la_LIBADD) \
 	$(LIBJAVA_CORE_EXTRA) \
 	$(libgcj_la_version_dep)
 libgcj_la_LINK = $(LIBLINK) $(libgcj_la_LDFLAGS) $(libgcj_la_version_arg)
@@ -532,7 +532,7 @@ libgcj-noncore-dummy.dll.a : $(srcdir)/libgcj-noncore-dummy.def
 libgcj_noncore_la_SOURCES =
 libgcj_noncore_la_LDFLAGS = $(libgcj_la_LDFLAGS)
 libgcj_noncore_la_LIBADD = $(libgcj_noncore_la_LIBADD_SUBOBJECTS) libgcj.la
-libgcj_noncore_la_DEPENDENCIES = libgcj-$(gcc_version).jar $(LIBLTDL) \
+libgcj_noncore_la_DEPENDENCIES = libgcj-$(gcc_version).jar \
 		$(libgcj_noncore_la_LIBADD) libgcj.la $(libgcj_la_version_dep)
 libgcj_noncore_la_LINK = $(libgcj_la_LINK)
 

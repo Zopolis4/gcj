@@ -36,9 +36,6 @@ The Free Software Foundation is independent of Sun Microsystems, Inc.  */
 
 #define ALLOC xmalloc
 #define REALLOC xrealloc
-#ifndef FREE
-#define FREE(PTR) free(PTR)
-#endif
 
 #ifdef JCF_word
 #define JCF_word JCF_u4
@@ -110,7 +107,7 @@ typedef struct GTY(()) JCF {
   unsigned int right_zip : 1;
   unsigned int finished : 1;
   jcf_filbuf_t filbuf;
-  PTR GTY ((skip)) read_state;
+  void * GTY ((skip)) read_state;
   const char *filename;
   const char *classname;
   /* Directory entry where it was found.  */
@@ -305,7 +302,6 @@ extern void jcf_dependency_set_dep_file (const char *);
 extern void jcf_dependency_add_file (const char *, int);
 extern void jcf_dependency_write (void);
 extern void jcf_dependency_init (int);
-extern void jcf_dependency_print_dummies (void);
 
 /* Declarations for path handling code.  */
 extern void jcf_path_init (void);
