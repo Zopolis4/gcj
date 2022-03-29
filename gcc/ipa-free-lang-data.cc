@@ -451,8 +451,8 @@ free_lang_data_in_type (tree type, class free_lang_data_d *fld)
 	  /* C++ FE uses TREE_PURPOSE to store initial values.  */
 	  TREE_PURPOSE (p) = NULL;
 	}
-      /* Java uses TYPE_MINVAL for TYPE_ARGUMENT_SIGNATURE.  */
-      TYPE_MINVAL (type) = NULL;
+      /* Java uses TYPE_MIN_VALUE for TYPE_ARGUMENT_SIGNATURE.  */
+      TYPE_MIN_VALUE (type) = NULL;
     }
   else if (TREE_CODE (type) == METHOD_TYPE)
     {
@@ -463,8 +463,8 @@ free_lang_data_in_type (tree type, class free_lang_data_d *fld)
 	  TREE_VALUE (p) = fld_simplified_type (TREE_VALUE (p), fld);
 	  TREE_PURPOSE (p) = NULL;
 	}
-      /* Java uses TYPE_MINVAL for TYPE_ARGUMENT_SIGNATURE.  */
-      TYPE_MINVAL (type) = NULL;
+      /* Java uses TYPE_MIN_VALUE for TYPE_ARGUMENT_SIGNATURE.  */
+      TYPE_MIN_VALUE (type) = NULL;
     }
   else if (RECORD_OR_UNION_TYPE_P (type))
     {

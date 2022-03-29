@@ -13605,13 +13605,13 @@ verify_type (const_tree t)
 				     TREE_TYPE (TYPE_MIN_VALUE (t))
 	 but does not for C sizetypes in LTO.  */
     }
-  /* Java uses TYPE_MINVAL for TYPE_ARGUMENT_SIGNATURE.  */
-  else if (TYPE_MINVAL (t)
+  /* Java uses TYPE_MIN_VALUE for TYPE_ARGUMENT_SIGNATURE.  */
+  else if (TYPE_MIN_VALUE (t)
 	   && ((TREE_CODE (t) != METHOD_TYPE && TREE_CODE (t) != FUNCTION_TYPE)
 	       || in_lto_p))
     {
-      error ("TYPE_MINVAL non-NULL");
-      debug_tree (TYPE_MINVAL (t));
+      error ("TYPE_MIN_VALUE non-NULL");
+      debug_tree (TYPE_MIN_VALUE (t));
       error_found = true;
     }
 
