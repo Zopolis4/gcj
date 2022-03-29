@@ -771,6 +771,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -945,6 +946,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE}'
@@ -1197,6 +1199,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1334,7 +1345,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1494,6 +1505,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -1532,12 +1544,12 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-as-accelerator-for=ARG
-                          build as offload target compiler. Specify offload
+                          build as offload target compiler. Specify offload
                           host triple by ARG
   --enable-offload-targets=LIST
                           enable offloading to devices from comma-separated
-                          LIST of TARGET[=DIR]. Use optional path to find
-                          offload target compiler during the build
+                          LIST of TARGET[=DIR]. Use optional path to find
+                          offload target compiler during the build
   --enable-offload-defaulted
 		If enabled, configured but not installed offload compilers and
 		libgomp plugins are silently ignored.  Useful for distribution
@@ -1547,7 +1559,7 @@ Optional Features:
   --enable-ld[=ARG]       build ld [ARG={default,yes,no}]
   --enable-compressed-debug-sections={all,gas,gold,ld,none}
                           Enable compressed debug sections for gas, gold or ld
-                          by default
+                          by default
   --disable-libquadmath   do not build libquadmath directory
   --disable-libquadmath-support
                           disable libquadmath support for Fortran
@@ -1572,17 +1584,17 @@ Optional Features:
                           plugins [none]
   --enable-host-shared    build host code as shared libraries
   --enable-stage1-languages[=all]
-                          choose additional languages to build during stage1.
+                          choose additional languages to build during stage1.
                           Mostly useful for compiler development
-  --enable-objc-gc        enable use of Boehm's garbage collector with the
-                          GNU Objective-C runtime
+  --enable-objc-gc        enable use of Boehm's garbage collector with the GNU
+                          Objective-C runtime
   --enable-vtable-verify  Enable vtable verification feature
   --enable-serial-[{host,target,build}-]configure
-                          force sequential configuration of sub-packages for
-                          the host, target or build machine, or all
+                          force sequential configuration of sub-packages for
+                          the host, target or build machine, or all
                           sub-packages
   --enable-maintainer-mode
-                          enable make rules and dependencies not useful (and
+                          enable make rules and dependencies not useful (and
                           sometimes confusing) to the casual installer
   --enable-stage1-checking[=all]
                           choose additional checking for stage1 of the
@@ -1595,22 +1607,21 @@ Optional Packages:
   --with-build-libsubdir=DIR  Directory where to find libraries for build system
   --with-system-zlib      use installed libz
   --with-mpc=PATH         specify prefix directory for installed MPC package.
-                          Equivalent to --with-mpc-include=PATH/include plus
+                          Equivalent to --with-mpc-include=PATH/include plus
                           --with-mpc-lib=PATH/lib
   --with-mpc-include=PATH specify directory for installed MPC include files
   --with-mpc-lib=PATH     specify directory for the installed MPC library
   --with-mpfr-dir=PATH    this option has been REMOVED
-  --with-mpfr=PATH        specify prefix directory for installed MPFR
-                          package. Equivalent to
-                          --with-mpfr-include=PATH/include plus
+  --with-mpfr=PATH        specify prefix directory for installed MPFR package.
+                          Equivalent to --with-mpfr-include=PATH/include plus
                           --with-mpfr-lib=PATH/lib
   --with-mpfr-include=PATH
                           specify directory for installed MPFR include files
   --with-mpfr-lib=PATH    specify directory for the installed MPFR library
   --with-gmp-dir=PATH     this option has been REMOVED
   --with-gmp=PATH         specify prefix directory for the installed GMP
-                          package. Equivalent to
-                          --with-gmp-include=PATH/include plus
+                          package. Equivalent to
+                          --with-gmp-include=PATH/include plus
                           --with-gmp-lib=PATH/lib
   --with-gmp-include=PATH specify directory for installed GMP include files
   --with-gmp-lib=PATH     specify directory for the installed GMP library
@@ -1624,15 +1635,15 @@ Optional Packages:
   --with-boot-ldflags=FLAGS
                           linker flags for stage2 and later
   --with-isl=PATH         Specify prefix directory for the installed isl
-                          package. Equivalent to
-                          --with-isl-include=PATH/include plus
+                          package. Equivalent to
+                          --with-isl-include=PATH/include plus
                           --with-isl-lib=PATH/lib
   --with-isl-include=PATH Specify directory for installed isl include files
   --with-isl-lib=PATH     Specify the directory for the installed isl library
   --with-target-bdw-gc=PATHLIST
                           specify prefix directory for installed bdw-gc
-                          package. Equivalent to
-                          --with-target-bdw-gc-include=PATH/include plus
+                          package. Equivalent to
+                          --with-target-bdw-gc-include=PATH/include plus
                           --with-target-bdw-gc-lib=PATH/lib
   --with-target-bdw-gc-include=PATHLIST
                           specify directories for installed bdw-gc include
