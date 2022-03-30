@@ -3576,8 +3576,9 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
      So check for a null exception spec on the op new we just called.  */
 
   nothrow = TYPE_NOTHROW_P (TREE_TYPE (alloc_fn));
-  check_new
-    = flag_check_new || (nothrow && !std_placement_new_fn_p (alloc_fn)) && ! use_java_new;
+  check_new = (flag_check_new 
+              || (nothrow && !std_placement_new_fn_p (alloc_fn)))
+              && ! use_java_new;
 
   if (cookie_size)
     {
@@ -4114,7 +4115,7 @@ build_java_class_ref (tree type)
 	}
     if (!field)
       {
-	error ("can%'t find %<class$%> in %qT", type);
+	error ("cannot find %<class$%> in %qT", type);
 	return error_mark_node;
       }
   }
