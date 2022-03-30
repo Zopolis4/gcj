@@ -13610,7 +13610,7 @@ verify_type (const_tree t)
 	   && ((TREE_CODE (t) != METHOD_TYPE && TREE_CODE (t) != FUNCTION_TYPE)
 	       || in_lto_p))
     {
-      error ("TYPE_MIN_VALUE non-NULL");
+      error ("%<TYPE_MIN_VALUE%> non-NULL");
       debug_tree (TYPE_MIN_VALUE (t));
       error_found = true;
     }
@@ -13849,8 +13849,8 @@ verify_type (const_tree t)
 	 that is 32bits.  */
       if (TREE_CODE (b) != INTEGER_TYPE)
 	{
-	  error ("TYPE_STRING_FLAG is set on type that does not look like "
-		 "char nor array of chars");
+	  error ("%<TYPE_STRING_FLAG%> is set on type that does not look like "
+		 "%<char%> nor array of chars");
 	  error_found = true;
 	}
     }
