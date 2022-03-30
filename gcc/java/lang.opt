@@ -152,9 +152,8 @@ Java JoinedOrMissing RejectNegative Alias(fclasspath=)
 faux-classpath
 Java Separate RejectNegative Undocumented
 
-; DONT LET THIS SNEAK INTO MASTER THIS NEEDS TO BE FIXED
-; fassert
-; Java Var(flag_assert) Init(1)
+fassert
+Java Var(flag_assert) Init(1)
 ; Permit the use of the assert keyword.
 
 fassume-compiled
