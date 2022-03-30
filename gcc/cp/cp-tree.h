@@ -2335,7 +2335,6 @@ struct GTY(()) lang_type {
   unsigned ref_needs_init : 1;
   unsigned has_const_copy_assign : 1;
   unsigned use_template : 2;
-  unsigned ptrmemfunc_flag : 1;
 
   unsigned has_mutable : 1;
   unsigned com_interface : 1;
@@ -2845,7 +2844,7 @@ enum lang_decl_selector
 
 struct GTY(()) lang_decl_base {
   ENUM_BITFIELD(lang_decl_selector) selector : 3;
-  ENUM_BITFIELD(languages) language : 1;
+  ENUM_BITFIELD(languages) language : 2;
   unsigned use_template : 2;
   unsigned not_really_extern : 1;	   /* var or fn */
   unsigned initialized_in_class : 1;	   /* var or fn */
