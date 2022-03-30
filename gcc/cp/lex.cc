@@ -701,7 +701,7 @@ handle_pragma_implementation (cpp_reader* /*dfile*/)
       impl_file_chain = ifiles;
     }
 }
--/* Indicate that this file uses Java-personality exception handling.  */
+/* Indicate that this file uses Java-personality exception handling.  */
 static void
 handle_pragma_java_exceptions (cpp_reader* /*dfile*/)
 {
