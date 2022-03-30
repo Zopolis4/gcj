@@ -10436,7 +10436,7 @@ static GTY(()) tree java_iface_lookup_fn;
 static tree
 build_java_interface_fn_ref (tree fn, tree instance)
 {
-  tree lookup_fn, method, idx;
+  tree lookup_fn, idx;
   tree klass_ref, iface, iface_ref;
   int i;
 
