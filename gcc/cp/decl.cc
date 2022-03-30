@@ -4442,7 +4442,7 @@ initialize_predefined_identifiers (void)
   static const predefined_identifier predefined_identifiers[] = {
     {"C++", &lang_name_cplusplus, cik_normal},
     {"C", &lang_name_c, cik_normal},
-    { "Java", &lang_name_java, 0 },
+    { "Java", &lang_name_java, cik_normal},
     /* Some of these names have a trailing space so that it is
        impossible for them to conflict with names written by users.  */
     {"__ct ", &ctor_identifier, cik_ctor},
@@ -8364,8 +8364,8 @@ cp_finish_decl (tree decl, tree init, bool init_const_expr_p,
 	{
          if (TYPE_FOR_JAVA (type) && MAYBE_CLASS_TYPE_P (type))
            {
-             tree jclass
-               = IDENTIFIER_GLOBAL_VALUE (get_identifier ("jclass"));-             /* Allow libjava/prims.cc define primitive classes.  */
+             tree jclass = get_global_binding (get_identifier ("jclass"));
+             /* Allow libjava/prims.cc define primitive classes.  */
              if (init != NULL_TREE
                  || jclass == NULL_TREE
                  || TREE_CODE (jclass) != TYPE_DECL
@@ -11414,7 +11414,7 @@ check_special_function_return_type (special_function_kind sfk,
 		  "qualifiers are not allowed on destructor declaration");
 
       /* We can't use the proper return type here because we run into
-	 problems with ambiguous bases and covariant returns.  */
+	 problems with ambiguous bases and covariant returns.
 	 Java classes are left unchanged because (void *) isn't a valid
 	 Java type, and we don't want to change the Java ABI.  */
       if (targetm.cxx.cdtor_returns_this () && !TYPE_FOR_JAVA (optype))
