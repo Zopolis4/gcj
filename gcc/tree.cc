@@ -13605,17 +13605,17 @@ verify_type (const_tree t)
 				     TREE_TYPE (TYPE_MIN_VALUE (t))
 	 but does not for C sizetypes in LTO.  */
     }
-  /* Java uses TYPE_MIN_VALUE for TYPE_ARGUMENT_SIGNATURE.  */
-  else if (TYPE_MIN_VALUE (t)
+  /* Java uses TYPE_MIN_VALUE_RAW for TYPE_ARGUMENT_SIGNATURE.  */
+  else if (TYPE_MIN_VALUE_RAW (t)
 	   && ((TREE_CODE (t) != METHOD_TYPE && TREE_CODE (t) != FUNCTION_TYPE)
 	       || in_lto_p))
     {
-      error ("%<TYPE_MIN_VALUE%> non-NULL");
-      debug_tree (TYPE_MIN_VALUE (t));
+      error ("%<TYPE_MIN_VALUE_RAW%> non-NULL");
+      debug_tree (TYPE_MIN_VALUE_RAW (t));
       error_found = true;
     }
 
-  /* Check various uses of TYPE_MAXVAL_RAW.  */
+  /* Check various uses of TYPE_MAX_VALUE_RAW.  */
   if (RECORD_OR_UNION_TYPE_P (t))
     {
       if (!TYPE_BINFO (t))
@@ -13840,7 +13840,8 @@ verify_type (const_tree t)
       error ("%<TYPE_CACHED_VALUES_P%> is set while it should not be");
       error_found = true;
     }
-  else if (TYPE_STRING_FLAG (t))
+  else if ((TREE_CODE (t) == ARRAY_TYPE || TREE_CODE (t) == INTEGER_TYPE)
+      && TYPE_STRING_FLAG (t))
     {
       const_tree b = t;
       if (TREE_CODE (b) == ARRAY_TYPE)
