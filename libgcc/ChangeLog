@@ -9,7 +9,7 @@
 	* config/ia64/crtend.S (__JCR_END__): Likewise.
 	* config/pa/pa64-hpux-lib.h (JCR_SECTION_NAME): Likewise.
 	* crtstuff.c: Re-add __LIBGCC_JCR_SECTION_NAME__ to preprocessor
-	conditionals.
+	conditionals && re-declare _Jv_RegisterClasses.
 	(__JCR_LIST__, __JCR_END__): Re-add.
 	(frame_dummy): Attempt to _Jv_RegisterClasses.
 	(__do_global_ctors_1): Likewise.
