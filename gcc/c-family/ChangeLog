@@ -1,3 +1,8 @@
+2022-03-31 Zopolis4 <creatorsmithmdt@gmail.com>
+
+	* c-cppbuiltin.c (c_cpp_builtins): Re-define
+	__LIBGCC_JCR_SECTION_NAME__.
+
 2022-03-09  Jakub Jelinek  <jakub@redhat.com>
 
 	PR c/104711

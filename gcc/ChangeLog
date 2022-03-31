@@ -1,11 +1,17 @@
-2022-03-24  Zopolis4  <creatorsmithmdt@gmail.com>
+2022-03-31  Zopolis4  <creatorsmithmdt@gmail.com>
 
 	* config/darwin.cc: Re-add the java workaround constraint about
 	putting small items into data/static data.
+	* config/darwin.h (JCR_SECTION_NAME): Define.
 	* config/i386/cygming.h (MODIFY_JNI_METHOD_CALL): Define.
+	* (TARGET_USE_JCR_SECTION): Likewise.
 	* config/i386/cygwin.h (LIBGCJ_SONAME): Re-add.
 	* config/i386/mingw32.h (LIBGCJ_SONAME): Likewise.
-	* doc/tm.texi.in: Document MODIFY_JNI_METHOD_CALL again.
+	* (TARGET_USE_JCR_SECTION): Likewise.
+	* config/pa/pa64-hpux.h (JCR_SECTION_NAME): Likewise.
+	* config/rs6000/aix71.h (TARGET_USE_JCR_SECTION): Likewise.
+	* doc/tm.texi.in: (MODIFY_JNI_METHOD_CALL) Document again.
+	(TARGET_USE_JCR_SECTION): Likewise.
 	* doc/tm.texi: Regenerate.
 	* doc/cfg.texi: Re-add references to gcj/java/libjava.
 	* doc/extend.texi: Likewise.
@@ -32,6 +38,9 @@
 	that were previously in tree.cc.
 	* gimple-fold.c (canonicalize_constructor_val):
 	set TREE_ADDRESSABLE for java.
+	* system.h: No longer poison JCR_SECTION_NAME and
+	TARGET_USE_JCR_SECTION.
+	* defaults.h: Re-add JCR_SECTION_NAME and TARGET_USE_JCR_SECTION.
 
 2022-03-09  Richard Biener  <rguenther@suse.de>
 

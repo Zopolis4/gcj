@@ -52,8 +52,8 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
    initializers specified here.  */
 
 /* We need to add frame_dummy to the initializer list if EH_FRAME_SECTION_NAME
-   is defined.  */
-#if defined(__LIBGCC_EH_FRAME_SECTION_NAME__)
+   or JCR_SECTION_NAME is defined. */
+#if defined(__LIBGCC_EH_FRAME_SECTION_NAME__) || defined(JCR_SECTION_NAME)
 #define PA_INIT_FRAME_DUMMY_ASM_OP ".dword P%frame_dummy"
 #else
 #define PA_INIT_FRAME_DUMMY_ASM_OP ""
