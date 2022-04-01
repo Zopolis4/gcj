@@ -3955,7 +3955,7 @@ optimize_range_tests_var_bound (enum tree_code opcode, int first, int length,
 	  rhs2 = gimple_assign_lhs (g);
 	  gsi_insert_before (&gsi, g, GSI_SAME_STMT);
 	}
-      if (tree_swap_operands_p (rhs1, rhs2))
+      if (tree_swap_operands_p (rhs1, rhs2, false))
 	{
 	  std::swap (rhs1, rhs2);
 	  ccode = swap_tree_comparison (ccode);

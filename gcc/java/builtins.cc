@@ -38,6 +38,7 @@ The Free Software Foundation is independent of Sun Microsystems, Inc.  */
 #include "fold-const.h"
 #include "stor-layout.h"
 #include "java-tree.h"
+#include "memmodel.h"
 
 /* FIXME: All these headers are necessary for sync_compare_and_swap.
    Front ends should never have to look at that.  */

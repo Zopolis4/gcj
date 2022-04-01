@@ -34,7 +34,7 @@ The Free Software Foundation is independent of Sun Microsystems, Inc.  */
 
 
 /* The dependency structure used for this invocation.  */
-class cpp_reader *dependencies;
+class deps *dependencies;
 
 /* The output file, or NULL if we aren't doing dependency tracking.  */
 static FILE *dep_out = NULL;

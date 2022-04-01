@@ -7504,7 +7504,7 @@ and,
       /* Since the order of @0 and @2 doesn't matter, let tree_swap_operands_p
 	 pick a canonical order.  This increases the chances of using the
 	 same pointer_plus in multiple checks.  */
-      (with { bool swap_p = tree_swap_operands_p (@0, @2);
+      (with { bool swap_p = tree_swap_operands_p (@0, @2, false);
 	      tree rhs_tree = wide_int_to_tree (sizetype, rhs); }
        (if (cmp == LT_EXPR)
 	(gt (convert:sizetype
