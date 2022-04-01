@@ -769,8 +769,8 @@ add_method_1 (tree this_class, int access_flags, tree name, tree function_type)
     DECL_FUNCTION_INITIALIZED_CLASS_TABLE (fndecl) =
       hash_table<ict_hasher>::create_ggc (50);
 
-  DECL_CHAIN (fndecl) = TYPE_METHODS (this_class);
-  TYPE_METHODS (this_class) = fndecl;
+  DECL_CHAIN (fndecl) = TYPE_FIELDS (this_class);
+  TYPE_FIELDS (this_class) = fndecl;
 
   if (!(access_flags & ACC_STATIC))
     SET_DECL_ALIGN (fndecl, MINIMUM_METHOD_BOUNDARY);
@@ -1561,7 +1561,6 @@ get_dispatch_vector (tree type)
   if (vtable == NULL_TREE)
     {
       HOST_WIDE_INT i;
-      tree method;
       tree super = CLASSTYPE_SUPER (type);
       HOST_WIDE_INT nvirtuals = tree_to_shwi (TYPE_NVIRTUALS (type));
       vtable = make_tree_vec (nvirtuals);
@@ -1574,7 +1573,7 @@ get_dispatch_vector (tree type)
 	    TREE_VEC_ELT (vtable, i) = TREE_VEC_ELT (super_vtable, i);
 	}
 
-      for (method = TYPE_METHODS (type);  method != NULL_TREE;
+      for (tree method = TYPE_FIELDS (type);  method != NULL_TREE;
 	   method = DECL_CHAIN (method))
 	{
 	  tree method_index = get_method_index (method);
@@ -1753,7 +1752,6 @@ make_class_data (tree type)
   HOST_WIDE_INT instance_field_count = 0;
   HOST_WIDE_INT field_count;
   tree field_array_type;
-  tree method;
   tree dtable_decl = NULL_TREE;
   HOST_WIDE_INT method_count = 0;
   tree method_array_type;
@@ -1918,7 +1916,7 @@ make_class_data (tree type)
     fields_decl = NULL_TREE;
 
   /* Build Method array. */
-  for (method = TYPE_METHODS (type);
+  for (tree method = TYPE_FIELDS (type);
        method != NULL_TREE; method = DECL_CHAIN (method))
     {
       tree init;
@@ -2509,7 +2507,6 @@ add_miranda_methods (tree base_class, tree search_class)
   for (binfo = TYPE_BINFO (search_class), i = 1;
        BINFO_BASE_ITERATE (binfo, i, base_binfo); i++)
     {
-      tree method_decl;
       tree elt = BINFO_TYPE (base_binfo);
 
       /* FIXME: This is totally bogus.  We should not be handling
@@ -2525,7 +2522,7 @@ add_miranda_methods (tree base_class, tree search_class)
       /* All base classes will have been laid out at this point, so the order 
          will be correct.  This code must match similar layout code in the 
          runtime.  */
-      for (method_decl = TYPE_METHODS (elt);
+      for (tree method_decl = TYPE_FIELDS (elt);
 	   method_decl; method_decl = DECL_CHAIN (method_decl))
 	{
 	  tree sig, override;
@@ -2558,7 +2555,7 @@ add_miranda_methods (tree base_class, tree search_class)
 void
 layout_class_methods (tree this_class)
 {
-  tree method_decl, dtable_count;
+  tree dtable_count;
   tree super_class, type_name;
 
   if (TYPE_NVIRTUALS (this_class))
@@ -2587,9 +2584,9 @@ layout_class_methods (tree this_class)
       add_miranda_methods (this_class, this_class);
     }
 
-  TYPE_METHODS (this_class) = nreverse (TYPE_METHODS (this_class));
+  TYPE_FIELDS (this_class) = nreverse (TYPE_FIELDS (this_class));
 
-  for (method_decl = TYPE_METHODS (this_class);
+  for (tree method_decl = TYPE_FIELDS (this_class);
        method_decl; method_decl = DECL_CHAIN (method_decl))
     dtable_count = layout_class_method (this_class, super_class,
 					method_decl, dtable_count);
@@ -2602,10 +2599,9 @@ layout_class_methods (tree this_class)
 int
 get_interface_method_index (tree method, tree interface)
 {
-  tree meth;
   int i = 1;
 
-  for (meth = TYPE_METHODS (interface); ; meth = DECL_CHAIN (meth))
+  for (tree meth = TYPE_FIELDS (interface); ; meth = DECL_CHAIN (meth))
     {
       if (meth == method)
 	return i;

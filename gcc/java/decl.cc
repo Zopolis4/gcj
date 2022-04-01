@@ -795,7 +795,7 @@ java_init_decl_processing (void)
   if (! flag_hash_synchronization)
     PUSH_FIELD (input_location, object_type_node, field, "sync_info",
 		build_pointer_type (object_type_node));
-  for (t = TYPE_FIELDS (object_type_node); t != NULL_TREE; t = DECL_CHAIN (t))
+  for (tree t = TYPE_FIELDS (object_type_node); t != NULL_TREE; t = DECL_CHAIN (t))
     FIELD_PRIVATE (t) = 1;
   FINISH_RECORD (object_type_node);
 
@@ -877,7 +877,7 @@ java_init_decl_processing (void)
   PUSH_FIELD (input_location, class_type_node, field, "engine", ptr_type_node);
   PUSH_FIELD (input_location,
 	      class_type_node, field, "reflection_data", ptr_type_node);
-  for (t = TYPE_FIELDS (class_type_node);  t != NULL_TREE;  t = DECL_CHAIN (t))
+  for (tree t = TYPE_FIELDS (class_type_node);  t != NULL_TREE;  t = DECL_CHAIN (t))
     FIELD_PRIVATE (t) = 1;
   push_super_field (class_type_node, object_type_node);
 
@@ -1938,13 +1938,11 @@ java_mark_cni_decl_local (tree decl)
 void
 java_mark_class_local (tree klass)
 {
-  tree t;
-
-  for (t = TYPE_FIELDS (klass); t ; t = DECL_CHAIN (t))
+  for (tree t = TYPE_FIELDS (klass); t ; t = DECL_CHAIN (t))
     if (FIELD_STATIC (t))
       java_mark_decl_local (t);
 
-  for (t = TYPE_METHODS (klass); t ; t = DECL_CHAIN (t))
+  for (tree t = TYPE_FIELDS (klass); t ; t = DECL_CHAIN (t))
     if (!METHOD_ABSTRACT (t))
       {
 	if (METHOD_NATIVE (t) && !flag_jni)

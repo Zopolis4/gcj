@@ -34,7 +34,7 @@ The Free Software Foundation is independent of Sun Microsystems, Inc.  */
 
 
 /* The dependency structure used for this invocation.  */
-struct deps *dependencies;
+class cpp_reader *dependencies;
 
 /* The output file, or NULL if we aren't doing dependency tracking.  */
 static FILE *dep_out = NULL;
@@ -132,9 +132,12 @@ jcf_dependency_write (void)
     return;
 
   gcc_assert (dependencies);
-
-  deps_write (dependencies, dep_out, 72);
+  
   if (print_dummies)
-    deps_phony_targets (dependencies, dep_out);
+    deps_write (dependencies, dep_out, 
+		CPP_OPTION (dependencies, deps.phony_targets) 72);
+  else
+    deps_write (dependencies, dep_out, 72);
+
   fflush (dep_out);
 }

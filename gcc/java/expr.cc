@@ -2239,7 +2239,7 @@ build_known_method_ref (tree method, tree method_type ATTRIBUTE_UNUSED,
       */
 
       int method_index = 0;
-      tree meth, ref;
+      tree ref;
 
       /* The method might actually be declared in some superclass, so
 	 we have to use its class context, not the caller's notion of
@@ -2254,7 +2254,7 @@ build_known_method_ref (tree method, tree method_type ATTRIBUTE_UNUSED,
       ref = build3 (COMPONENT_REF, method_ptr_type_node, ref,
 		    lookup_field (&class_type_node, methods_ident),
 		    NULL_TREE);
-      for (meth = TYPE_METHODS (self_type);
+      for (tree meth = TYPE_FIELDS (self_type);
 	   ; meth = DECL_CHAIN (meth))
 	{
 	  if (method == meth)

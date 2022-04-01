@@ -499,7 +499,7 @@ handle_constant (JCF *jcf, int index, enum cpool_tag purpose)
     return 0;
 
   if (! CPOOL_INDEX_IN_RANGE (&jcf->cpool, index))
-    error ("<constant pool index %d not in range>", index);
+    error ("constant pool index %d not in range", index);
   
   kind = JPOOL_TAG (jcf, index);
 
@@ -509,7 +509,7 @@ handle_constant (JCF *jcf, int index, enum cpool_tag purpose)
 	  && kind == CONSTANT_Utf8)
 	;
       else
-	error ("<constant pool index %d unexpected type", index);
+	error ("constant pool index %d unexpected type", index);
     }
 
   switch (kind)
@@ -1003,7 +1003,7 @@ handle_signature_attribute (int member_index, JCF *jcf,
 			      attribute_length, attr_type);	\
 }
 
-#include "jcf-reader.c"
+#include "jcf-reader.cc"
 
 tree
 parse_signature (JCF *jcf, int sig_index)
@@ -1420,13 +1420,13 @@ jcf_parse (JCF* jcf)
   bitmap_clear (field_offsets);
 
   if (jcf_parse_preamble (jcf) != 0)
-    fatal_error (input_location, "not a valid Java .class file");
+    fatal_error (input_location, "not a valid Java %<.class%> file");
   code = jcf_parse_constant_pool (jcf);
   if (code != 0)
     fatal_error (input_location, "error while parsing constant pool");
   code = verify_constant_pool (jcf);
   if (code > 0)
-    fatal_error (input_location, "error in constant pool entry #%d\n", code);
+    fatal_error (input_location, "error in constant pool entry %d\n", code);
 
   jcf_parse_class (jcf);
   if (main_class == NULL_TREE)
@@ -1545,7 +1545,6 @@ java_layout_seen_class_methods (void)
 static void
 parse_class_file (void)
 {
-  tree method;
   location_t save_location = input_location;
 
   java_layout_seen_class_methods ();
@@ -1564,7 +1563,7 @@ parse_class_file (void)
 
   gen_indirect_dispatch_tables (current_class);
 
-  for (method = TYPE_METHODS (current_class);
+  for (tree method = TYPE_FIELDS (current_class);
        method != NULL_TREE; method = DECL_CHAIN (method))
     {
       JCF *jcf = current_jcf;
@@ -1749,7 +1748,7 @@ java_parse_file (void)
       finput = fopen (main_input_filename, "r");
       if (finput == NULL)
 	fatal_error (input_location,
-		     "can%'t open %s: %m", LOCATION_FILE (input_location));
+		     "cannot open %s: %m", LOCATION_FILE (input_location));
       list = XNEWVEC (char, avail);
       next = list;
       for (;;)
@@ -1884,11 +1883,11 @@ java_parse_file (void)
       /* Close previous descriptor, if any */
       if (finput && fclose (finput))
 	fatal_error (input_location,
-		     "can%'t close input file %s: %m", main_input_filename);
+		     "cannot close input file %s: %m", main_input_filename);
       
       finput = fopen (filename, "rb");
       if (finput == NULL)
-	fatal_error (input_location, "can%'t open %s: %m", filename);
+	fatal_error (input_location, "cannot open %s: %m", filename);
 
 #ifdef IO_BUFFER_SIZE
       setvbuf (finput, xmalloc (IO_BUFFER_SIZE),
