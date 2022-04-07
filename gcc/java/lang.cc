@@ -261,8 +261,9 @@ java_handle_option (size_t scode, const char *arg, int value,
       break;
 
     case OPT_fdump_:
-      if (!g->get_dumps ()->dump_switch_p (arg))
-	return false;
+      /* FIXME: This is no longer a bool value */
+      /* if (!g->get_dumps ()->dump_switch_p (arg))
+	return false; */
       break;
 
     case OPT_fencoding_:
