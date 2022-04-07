@@ -474,7 +474,7 @@ define_builtin (enum built_in_function val,
   SET_DECL_ASSEMBLER_NAME (decl, get_identifier (libname));
   pushdecl (decl);
   DECL_BUILT_IN_CLASS (decl) = BUILT_IN_NORMAL;
-  DECL_FUNCTION_CODE (decl) = val;
+  val = DECL_FUNCTION_CODE (decl);
   set_call_expr_flags (decl, flags);
 
   set_builtin_decl (val, decl, true);
