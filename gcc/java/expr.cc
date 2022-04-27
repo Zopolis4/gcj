@@ -1299,8 +1299,8 @@ expand_java_return (tree type)
 	 The whole if expression just goes away if INT_TYPE_SIZE < 32
 	 is false. */
       if (INT_TYPE_SIZE < 32
-	  && (GET_MODE_SIZE (TYPE_MODE (TREE_TYPE (res)))
-	      < GET_MODE_SIZE (TYPE_MODE (type))))
+	  && known_lt (GET_MODE_SIZE (TYPE_MODE (TREE_TYPE (res))),
+	               GET_MODE_SIZE (TYPE_MODE (type))))
 	retval = build1 (NOP_EXPR, TREE_TYPE (res), retval);
       
       TREE_SIDE_EFFECTS (retval) = 1;
