@@ -133,11 +133,7 @@ jcf_dependency_write (void)
 
   gcc_assert (dependencies);
   
-  if (print_dummies)
-    deps_write (dependencies, dep_out, 
-		CPP_OPTION (dependencies, deps.phony_targets) 72);
-  else
-    deps_write (dependencies, dep_out, 72);
+  deps_phony_targets (dependencies, dep_out);
 
   fflush (dep_out);
 }
