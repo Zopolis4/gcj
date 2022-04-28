@@ -23,6 +23,7 @@ The Free Software Foundation is independent of Sun Microsystems, Inc.  */
 
 /* Hacked by Per Bothner <bothner@cygnus.com> February 1996. */
 
+
 #include "config.h"
 #include "system.h"
 #include "coretypes.h"
@@ -58,6 +59,7 @@ static bool java_decl_ok_for_sibcall (const_tree);
 static enum classify_record java_classify_record (tree type);
 
 static tree java_eh_personality (void);
+static tree handle_nonnull_attribute (tree *, tree, tree, int, bool *);
 
 #ifndef TARGET_OBJECT_SUFFIX
 # define TARGET_OBJECT_SUFFIX ".o"
@@ -912,6 +914,17 @@ java_eh_personality (void)
   if (!java_eh_personality_decl)
     java_eh_personality_decl = build_personality_function ("gcj");
   return java_eh_personality_decl;
+}
+
+/* Handle the "nonnull" attribute.
+   FIXME: Implement an actual function here. */
+
+static tree
+handle_nonnull_attribute
+  (tree ARG_UNUSED (*node), tree ARG_UNUSED (name), tree ARG_UNUSED (args),
+  int ARG_UNUSED (flags), bool ARG_UNUSED (*no_add_attrs))
+{
+  return NULL_TREE;
 }
 
 #include "gt-java-lang.h"
