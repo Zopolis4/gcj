@@ -23,7 +23,6 @@ along with GCC; see the file COPYING3.  If not see
 #include "optabs-query.h"
 #include "optabs-libfuncs.h"
 #include "vec-perm-indices.h"
-#include "memmodel.h"
 
 /* Generate code for a widening multiply.  */
 extern rtx expand_widening_mult (machine_mode, rtx, rtx, rtx, int, optab);
