@@ -1426,7 +1426,7 @@ jcf_parse (JCF* jcf)
     fatal_error (input_location, "error while parsing constant pool");
   code = verify_constant_pool (jcf);
   if (code > 0)
-    fatal_error (input_location, "error in constant pool entry %d\n", code);
+    fatal_error (input_location, "error in constant pool entry %d", code);
 
   jcf_parse_class (jcf);
   if (main_class == NULL_TREE)
