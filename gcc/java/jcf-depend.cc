@@ -28,22 +28,23 @@ The Free Software Foundation is independent of Sun Microsystems, Inc.  */
 #include "system.h"
 #include "coretypes.h"
 #include "mkdeps.h"
+#include "cpplib.h"
 
 #include "jcf.h"
 
 
 
 /* The dependency structure used for this invocation.  */
-struct deps *dependencies;
+struct mkdeps *dependencies;
+
+/* FIXME: A hack to convert from mkdeps to cpp_reader */
+const cpp_reader *deps;
 
 /* The output file, or NULL if we aren't doing dependency tracking.  */
 static FILE *dep_out = NULL;
 
 /* Nonzero if system files should be added.  */
 static int system_files;
-
-/* Nonzero if we are dumping out dummy dependencies.  */
-static int print_dummies;
 
 
 
@@ -120,12 +121,6 @@ jcf_dependency_init (int system_p)
 }
 
 void
-jcf_dependency_print_dummies (void)
-{
-  print_dummies = 1;
-}
-
-void
 jcf_dependency_write (void)
 {
   if (! dep_out)
@@ -133,8 +128,6 @@ jcf_dependency_write (void)
 
   gcc_assert (dependencies);
 
-  deps_write (dependencies, dep_out, 72);
-  if (print_dummies)
-    deps_phony_targets (dependencies, dep_out);
+  deps_write (deps, dep_out, 72);
   fflush (dep_out);
 }

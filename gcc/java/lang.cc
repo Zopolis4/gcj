@@ -36,6 +36,7 @@ The Free Software Foundation is independent of Sun Microsystems, Inc.  */
 #include "tree-dump.h"
 #include "opts.h"
 #include "context.h"
+#include "cpplib.h"
 
 static bool java_init (void);
 static void java_finish (void);
@@ -162,6 +163,9 @@ struct GTY(()) language_function {
 #undef LANG_HOOKS_EH_USE_CXA_END_CLEANUP
 #define LANG_HOOKS_EH_USE_CXA_END_CLEANUP  true
 
+/* CPP's options.  */
+cpp_options *cpp_opts;
+
 /* Each front end provides its own.  */
 struct lang_hooks lang_hooks = LANG_HOOKS_INITIALIZER;
 
@@ -208,7 +212,7 @@ java_handle_option (size_t scode, const char *arg, HOST_WIDE_INT value,
       break;
 
     case OPT_MP:
-      jcf_dependency_print_dummies ();
+      cpp_opts->deps.phony_targets = true;
       break;
 
     case OPT_MT:

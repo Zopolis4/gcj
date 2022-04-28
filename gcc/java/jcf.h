@@ -305,7 +305,6 @@ extern void jcf_dependency_set_dep_file (const char *);
 extern void jcf_dependency_add_file (const char *, int);
 extern void jcf_dependency_write (void);
 extern void jcf_dependency_init (int);
-extern void jcf_dependency_print_dummies (void);
 
 /* Declarations for path handling code.  */
 extern void jcf_path_init (void);
