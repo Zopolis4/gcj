@@ -16,7 +16,7 @@
 
 dnl Process this file with autoconf to produce configure.
 
-AC_INIT
+AC_INIT([gc], [6.6], [no-define])
 AC_CONFIG_SRCDIR(gcj_mlc.c)
 # This works around the fact that libtool configuration may change LD
 # for this particular configuration, but some shells, instead of
@@ -36,7 +36,7 @@ ACX_NONCANONICAL_TARGET
 mkinstalldirs="`cd $ac_aux_dir && ${PWDCMD-pwd}`/mkinstalldirs"
 AC_SUBST(mkinstalldirs)
 
-AM_INIT_AUTOMAKE(gc, 6.6, no-define)
+AM_INIT_AUTOMAKE
 
 # The autoconf 2.5x version of the no-executables hack.
 GCC_NO_EXECUTABLES
