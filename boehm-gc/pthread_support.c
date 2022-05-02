@@ -738,6 +738,20 @@ int GC_get_nprocs()
 }
 #endif /* GC_LINUX_THREADS */
 
+#if defined(CAN_HANDLE_FORK) && defined(THREAD_SANITIZER)
+# include "private/gc_pmark.h" /* for MS_NONE */
+
+  /* Workaround for TSan which does not notice that the GC lock */
+  /* is acquired in fork_prepare_proc().                        */
+  GC_ATTR_NO_SANITIZE_THREAD
+  static GC_bool collection_in_progress(void)
+  {
+    return GC_mark_state != MS_NONE;
+  }
+#else
+# define collection_in_progress() GC_collection_in_progress()
+#endif
+
 /* We hold the GC lock.  Wait until an in-progress GC has finished.	*/
 /* Repeatedly RELEASES GC LOCK in order to wait.			*/
 /* If wait_for_all is true, then we exit with the GC lock held and no	*/
@@ -746,12 +760,12 @@ int GC_get_nprocs()
 extern GC_bool GC_collection_in_progress();
 void GC_wait_for_gc_completion(GC_bool wait_for_all)
 {
-    if (GC_incremental && GC_collection_in_progress()) {
+    if (GC_incremental && collection_in_progress()) {
 	int old_gc_no = GC_gc_no;
 
 	/* Make sure that no part of our stack is still on the mark stack, */
 	/* since it's about to be unmapped.				   */
-	while (GC_incremental && GC_collection_in_progress()
+	while (GC_incremental && collection_in_progress()
 	       && (wait_for_all || old_gc_no == GC_gc_no)) {
 	    ENTER_GC();
 	    GC_in_thread_creation = TRUE;
