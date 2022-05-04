@@ -1,0 +1,46 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [gcjmainbuild]
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Deps
+      run: |
+          sudo apt-get update;
+          sudo apt-get install -y \
+                  automake \
+                  autoconf \
+                  libtool \
+                  autogen \
+                  bison \
+                  flex \
+                  libgmp3-dev \
+                  libmpfr-dev \
+                  libmpc-dev \
+                  build-essential \
+                  gcc-multilib \
+                  g++-multilib \
+                  dejagnu
+
+    - name: Configure
+      run: |
+           mkdir -p gcj-build;
+           cd gcj-build;
+           ../configure \
+               --enable-languages=java \
+               --disable-bootstrap \
+               --enable-multilib
+
+    - name: Build
+      shell: bash
+      run: |
+           cd gcj-build; \
+           make -Otarget -j $(nproc) 2>&1 | tee log
+
