@@ -1941,6 +1941,8 @@ java_mark_class_local (tree klass)
 {
   for (tree t = TYPE_FIELDS (klass); t ; t = DECL_CHAIN (t))
     if (FIELD_STATIC (t))
+      /* (((TREE_CODE (decl) == VAR_DECL) || (TREE_CODE (decl) == PARM_DECL)
+          || (TREE_CODE (decl) == VAR_DECL)) && (FIELD_STATIC (t))) */
       java_mark_decl_local (t);
 
   for (tree t = TYPE_FIELDS (klass); t ; t = DECL_CHAIN (t))

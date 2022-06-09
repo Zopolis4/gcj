@@ -2588,8 +2588,9 @@ layout_class_methods (tree this_class)
 
   for (tree method_decl = TYPE_FIELDS (this_class);
        method_decl; method_decl = DECL_CHAIN (method_decl))
-    dtable_count = layout_class_method (this_class, super_class,
-					method_decl, dtable_count);
+    if (TREE_CODE (TREE_TYPE (method_decl)) == FUNCTION_TYPE)
+      dtable_count = layout_class_method (this_class, super_class,
+        method_decl, dtable_count);
 
   TYPE_NVIRTUALS (this_class) = dtable_count;
 }
