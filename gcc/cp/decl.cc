@@ -8478,19 +8478,19 @@ cp_finish_decl (tree decl, tree init, bool init_const_expr_p,
 	     is *not* defined.  */
 	  && (!DECL_EXTERNAL (decl) || init))
 	{
-    if (TYPE_FOR_JAVA (type) && MAYBE_CLASS_TYPE_P (type))
-      {
-        tree jclass = get_global_binding (get_identifier ("jclass"));
-        /* Allow libjava/prims.cc define primitive classes.  */
-        if (init != NULL_TREE
-            || jclass == NULL_TREE
-            || TREE_CODE (jclass) != TYPE_DECL
-            || !POINTER_TYPE_P (TREE_TYPE (jclass))
-            || !same_type_ignoring_top_level_qualifiers_p
-            (type, TREE_TYPE (TREE_TYPE (jclass))))
-          error ("Java object %qD not allocated with %<new%>", decl);
-        init = NULL_TREE;
-      }
+        if (TYPE_FOR_JAVA (type) && MAYBE_CLASS_TYPE_P (type))
+          {
+            tree jclass = get_global_binding (get_identifier ("jclass"));
+            /* Allow libjava/prims.cc define primitive classes.  */
+            if (init != NULL_TREE
+                || jclass == NULL_TREE
+                || TREE_CODE (jclass) != TYPE_DECL
+                || !POINTER_TYPE_P (TREE_TYPE (jclass))
+                || !same_type_ignoring_top_level_qualifiers_p
+                (type, TREE_TYPE (TREE_TYPE (jclass))))
+              error ("Java object %qD not allocated with %<new%>", decl);
+            init = NULL_TREE;
+          }
 	  cleanups = make_tree_vector ();
 	  init = check_initializer (decl, init, flags, &cleanups);
 
