@@ -555,6 +555,9 @@ if test "$ac_cv_header_ltdl_h" = "no"; then
 else
   AC_DEFINE(USE_LTDL, 1, [Define if libltdl is in use.])
 fi
+AC_CHECK_LIB(tdl, lt_dlforeach,
+             AC_DEFINE(USE_LTDL, 1, [Define if libltdl is in use.]),
+             AC_DEFINE(USE_LTDL, 0, [Define if libltdl is in use.]))
 
 ACX_LT_HOST_FLAGS
 AM_PROG_GCJ
