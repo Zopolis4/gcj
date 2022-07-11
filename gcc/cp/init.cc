@@ -3334,7 +3334,7 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
 
       use_java_new = 1;
 
-      if (!get_identifier (alloc_name))
+      if (!(alloc_fn = get_global_binding (get_identifier (alloc_name))))
 	{
           if (complain & tf_error)
             error ("call to Java constructor with %qs undefined", alloc_name);
@@ -3346,7 +3346,6 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
             error ("%qD should never be overloaded", alloc_fn);
 	  return error_mark_node;
 	}
-      alloc_fn = OVL_FIRST (TREE_VALUE (alloc_fn));
       if (TREE_CODE (alloc_fn) != FUNCTION_DECL
 	  || TREE_CODE (TREE_TYPE (alloc_fn)) != FUNCTION_TYPE
 	  || !POINTER_TYPE_P (TREE_TYPE (TREE_TYPE (alloc_fn))))

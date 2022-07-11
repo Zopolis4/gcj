@@ -761,21 +761,21 @@ build_throw (location_t loc, tree exp)
 
   if (exp && decl_is_java_type (TREE_TYPE (exp), 1))
     {
-      tree fn = get_identifier ("_Jv_Throw");
+      tree name = get_identifier ("_Jv_Throw");
+      tree fn = get_global_binding (name);
       if (!fn)
        {
          /* Declare void _Jv_Throw (void *).  */
          tree tmp;
          tmp = build_function_type_list (ptr_type_node,
                                          ptr_type_node, NULL_TREE);
-         fn = push_throw_library_fn (fn, tmp);
+         fn = push_throw_library_fn (name, tmp);
        }
       else if (really_overloaded_fn (fn))
        {
          error ("%qD should never be overloaded", fn);
          return error_mark_node;
        }
-      fn = OVL_FIRST (TREE_VALUE (fn));
       exp = cp_build_function_call_nary (fn, tf_warning_or_error,
                                         exp, NULL_TREE);
     }
