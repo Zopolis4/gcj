@@ -66,7 +66,7 @@ extern void deps_add_dep (class mkdeps *, const char *);
 
 /* Write out a deps buffer to a specified file.  The last argument
    is the number of columns to word-wrap at (0 means don't wrap).  */
-extern void deps_write (const cpp_reader *, FILE *, unsigned int);
+extern void deps_write (class mkdeps *, FILE *, bool, unsigned int);
 
 /* Write out a deps buffer to a file, in a form that can be read back
    with deps_restore.  Returns nonzero on error, in which case the
