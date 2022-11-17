@@ -2452,6 +2452,10 @@ extern tree vector_element_bits_tree (const_tree);
 
 #define TYPE_MAX_VALUE(NODE) \
   (NUMERICAL_TYPE_CHECK (NODE)->type_non_common.maxval)
+/* FIXME: Replace legacy uses of TYPE_METHODS in the Java frontend and then
+   remove this definition. */
+#define TYPE_METHODS(NODE)        \
+  (RECORD_OR_UNION_CHECK (NODE)->type_non_common.maxval)
 #define TYPE_METHOD_BASETYPE(NODE)			\
   (FUNC_OR_METHOD_CHECK (NODE)->type_non_common.maxval)
 #define TYPE_OFFSET_BASETYPE(NODE)			\
