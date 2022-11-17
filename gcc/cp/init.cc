@@ -3041,6 +3041,7 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
   tree alloc_fn;
   tree cookie_expr, init_expr;
   int nothrow, check_new;
+  int use_java_new = 0;
   /* If non-NULL, the number of extra bytes to allocate at the
      beginning of the storage allocated for an array-new expression in
      order to store the number of elements.  */
@@ -3311,7 +3312,62 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
 
   bool member_new_p = false;
 
+  bool member_delete_p = (!globally_qualified_p
+			  && CLASS_TYPE_P (elt_type)
+			  && (array_p
+			      ? TYPE_GETS_VEC_DELETE (elt_type)
+			      : TYPE_GETS_REG_DELETE (elt_type)));
+
   /* Allocate the object.  */
+  if (vec_safe_is_empty (*placement) && TYPE_FOR_JAVA (elt_type))
+    {
+      tree class_addr;
+      tree class_decl;
+      static const char alloc_name[] = "_Jv_AllocObject";
+
+      if (!MAYBE_CLASS_TYPE_P (elt_type))
+	{
+	  error ("%qT isn%'t a valid Java class type", elt_type);
+	  return error_mark_node;
+	}
+
+      class_decl = build_java_class_ref (elt_type);
+      if (class_decl == error_mark_node)
+	return error_mark_node;
+
+      use_java_new = 1;
+
+      if (!(alloc_fn = get_global_binding (get_identifier (alloc_name))))
+	{
+	  if (complain & tf_error)
+	    error ("call to Java constructor with %qs undefined", alloc_name);
+	  return error_mark_node;
+	}
+      else if (really_overloaded_fn (alloc_fn))
+	{
+	  if (complain & tf_error)
+	    error ("%qD should never be overloaded", alloc_fn);
+	  return error_mark_node;
+	}
+      if (TREE_CODE (alloc_fn) != FUNCTION_DECL
+	  || TREE_CODE (TREE_TYPE (alloc_fn)) != FUNCTION_TYPE
+	  || !POINTER_TYPE_P (TREE_TYPE (TREE_TYPE (alloc_fn))))
+	{
+	  if (complain & tf_error)
+	    error ("%qD is not a function returning a pointer", alloc_fn);
+	  return error_mark_node;
+	}
+      class_addr = build1 (ADDR_EXPR, jclass_node, class_decl);
+      alloc_call = cp_build_function_call_nary (alloc_fn, complain,
+						class_addr, NULL_TREE);
+    }
+  else if (TYPE_FOR_JAVA (elt_type) && MAYBE_CLASS_TYPE_P (elt_type))
+    {
+      error ("Java class %q#T object allocated using placement new", elt_type);
+      return error_mark_node;
+    }
+  else
+    {
   tree fnname;
   tree fns;
 
@@ -3322,12 +3378,6 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
 		 && (array_p
 		     ? TYPE_HAS_ARRAY_NEW_OPERATOR (elt_type)
 		     : TYPE_HAS_NEW_OPERATOR (elt_type));
-
-  bool member_delete_p = (!globally_qualified_p
-			  && CLASS_TYPE_P (elt_type)
-			  && (array_p
-			      ? TYPE_GETS_VEC_DELETE (elt_type)
-			      : TYPE_GETS_REG_DELETE (elt_type)));
 
   if (member_new_p)
     {
@@ -3413,8 +3463,11 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
 
       alloc_call = build_operator_new_call (fnname, placement,
 					    &size, &cookie_size,
-					    align_arg, outer_nelts_check,
+						align_arg,
+						outer_nelts_check,
 					    &alloc_fn, complain);
+
+	    }
     }
 
   if (alloc_call == error_mark_node)
@@ -3527,8 +3580,9 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
      So check for a null exception spec on the op new we just called.  */
 
   nothrow = TYPE_NOTHROW_P (TREE_TYPE (alloc_fn));
-  check_new
-    = flag_check_new || (nothrow && !std_placement_new_fn_p (alloc_fn));
+  check_new = (flag_check_new
+	      || (nothrow && !std_placement_new_fn_p (alloc_fn)))
+	      && ! use_java_new;
 
   if (cookie_size)
     {
@@ -3732,7 +3786,7 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
      unambiguous matching deallocation function can be found,
      propagating the exception does not cause the object's memory to be
      freed.  */
-  if (flag_exceptions && (init_expr || member_delete_p))
+  if (flag_exceptions && (init_expr || member_delete_p) && ! use_java_new)
     {
       enum tree_code dcode = array_p ? VEC_DELETE_EXPR : DELETE_EXPR;
       tree cleanup;
@@ -4034,6 +4088,60 @@ build_new (location_t loc, vec<tree, va_gc> **placement, tree type,
 
   return rval;
 }
+
+/* Given a Java class, return a decl for the corresponding java.lang.Class.  */
+
+tree
+build_java_class_ref (tree type)
+{
+  tree name = NULL_TREE, class_decl;
+  static tree CL_suffix = NULL_TREE;
+  if (CL_suffix == NULL_TREE)
+    CL_suffix = get_identifier("class$");
+  if (jclass_node == NULL_TREE)
+    {
+      jclass_node = get_global_binding (get_identifier ("jclass"));
+      if (jclass_node == NULL_TREE)
+	{
+	  error ("call to Java constructor, while %<jclass%> undefined");
+	  return error_mark_node;
+	}
+      jclass_node = TREE_TYPE (jclass_node);
+    }
+
+  /* Mangle the class$ field.  */
+  {
+    tree field;
+    for (field = TYPE_FIELDS (type); field; field = DECL_CHAIN (field))
+      if (DECL_NAME (field) == CL_suffix)
+	{
+	  mangle_decl (field);
+	  name = DECL_ASSEMBLER_NAME (field);
+	  break;
+	}
+    if (!field)
+      {
+	error ("cannot find %<class$%> in %qT", type);
+	return error_mark_node;
+      }
+  }
+
+  class_decl = get_global_binding (name);
+  if (class_decl == NULL_TREE)
+    {
+      class_decl = build_decl (input_location,
+			       VAR_DECL, name, TREE_TYPE (jclass_node));
+      TREE_STATIC (class_decl) = 1;
+      DECL_EXTERNAL (class_decl) = 1;
+      TREE_PUBLIC (class_decl) = 1;
+      DECL_ARTIFICIAL (class_decl) = 1;
+      DECL_IGNORED_P (class_decl) = 1;
+      pushdecl_top_level (class_decl);
+      make_decl_rtl (class_decl);
+    }
+  return class_decl;
+}
+
 
 static tree
 build_vec_delete_1 (location_t loc, tree base, tree maxindex, tree type,

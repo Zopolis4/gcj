@@ -1458,6 +1458,8 @@ structural_comptypes (tree t1, tree t2, int strict)
 				 ce_type))
 	return false;
     }
+  if (TYPE_FOR_JAVA (t1) != TYPE_FOR_JAVA (t2))
+    return false;
 
   /* Allow for two different type nodes which have essentially the same
      definition.  Note that we already checked for equality of the type
