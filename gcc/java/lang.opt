@@ -154,7 +154,7 @@ Java Separate RejectNegative Undocumented
 
 fassert
 Java Var(flag_assert) Init(1)
-Permit the use of the assert keyword.
+; Permit the use of the assert keyword.
 
 fassume-compiled
 Java
