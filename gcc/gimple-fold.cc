@@ -6141,7 +6141,7 @@ fold_stmt_1 (gimple_stmt_iterator *gsi, bool inplace, tree (*valueize) (tree))
 	    {
 	      tree rhs1 = gimple_assign_rhs1 (stmt);
 	      tree rhs2 = gimple_assign_rhs2 (stmt);
-	      if (tree_swap_operands_p (rhs1, rhs2))
+	      if (tree_swap_operands_p (rhs1, rhs2, false))
 		{
 		  gimple_assign_set_rhs1 (stmt, rhs2);
 		  gimple_assign_set_rhs2 (stmt, rhs1);
@@ -6177,7 +6177,9 @@ fold_stmt_1 (gimple_stmt_iterator *gsi, bool inplace, tree (*valueize) (tree))
 	      {
 		tree arg1 = gimple_call_arg (call, opno);
 		tree arg2 = gimple_call_arg (call, opno + 1);
-		if (tree_swap_operands_p (arg1, arg2))
+		/* FIXME: Find the correct third value to set for
+		tree_swap_operands_p here. */
+		if (tree_swap_operands_p (arg1, arg2, false))
 		  {
 		    gimple_call_set_arg (call, opno, arg2);
 		    gimple_call_set_arg (call, opno + 1, arg1);
@@ -6225,7 +6227,7 @@ fold_stmt_1 (gimple_stmt_iterator *gsi, bool inplace, tree (*valueize) (tree))
 	/* Canonicalize operand order.  */
 	tree lhs = gimple_cond_lhs (stmt);
 	tree rhs = gimple_cond_rhs (stmt);
-	if (tree_swap_operands_p (lhs, rhs))
+	if (tree_swap_operands_p (lhs, rhs, false))
 	  {
 	    gcond *gc = as_a <gcond *> (stmt);
 	    gimple_cond_set_lhs (gc, rhs);

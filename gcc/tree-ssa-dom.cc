@@ -1449,7 +1449,7 @@ record_equality (tree x, tree y, class const_and_copies *const_and_copies)
 {
   tree prev_x = NULL, prev_y = NULL;
 
-  if (tree_swap_operands_p (x, y))
+  if (tree_swap_operands_p (x, y, false))
     std::swap (x, y);
 
   /* Most of the time tree_swap_operands_p does what we want.  But there
