@@ -9916,7 +9916,7 @@ build_common_builtin_nodes (void)
 			ECF_PURE | ECF_NOTHROW | ECF_LEAF);
 
   /* If there's a possibility that we might use the ARM EABI, build the
-    alternate __cxa_end_cleanup node used to resume from C++.  */
+    alternate __cxa_end_cleanup node used to resume from C++ and Java.  */
   if (targetm.arm_eabi_unwinder)
     {
       ftype = build_function_type_list (void_type_node, NULL_TREE);
