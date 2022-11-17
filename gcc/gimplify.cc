@@ -892,7 +892,12 @@ mostly_copy_tree_r (tree *tp, int *walk_subtrees, void *data)
   /* Stop at types, decls, constants like copy_tree_r.  */
   else if (TREE_CODE_CLASS (code) == tcc_type
 	   || TREE_CODE_CLASS (code) == tcc_declaration
-	   || TREE_CODE_CLASS (code) == tcc_constant)
+	   || TREE_CODE_CLASS (code) == tcc_constant
+	   /* We can't do anything sensible with a BLOCK used as an
+	      expression, but we also can't just die when we see it
+	      because of non-expression uses.  So we avert our eyes
+	      and cross our fingers.  Silly Java.  */
+	   || code == BLOCK)
     *walk_subtrees = 0;
 
   /* Cope with the statement expression extension.  */

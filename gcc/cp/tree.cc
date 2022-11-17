@@ -44,6 +44,7 @@ static tree build_target_expr (tree, tree, tsubst_flags_t);
 static tree count_trees_r (tree *, int *, void *);
 static tree verify_stmt_tree_r (tree *, int *, void *);
 
+static tree handle_java_interface_attribute (tree *, tree, tree, int, bool *);
 static tree handle_init_priority_attribute (tree *, tree, tree, int, bool *);
 static tree handle_abi_tag_attribute (tree *, tree, tree, int, bool *);
 static tree handle_contract_attribute (tree *, tree, tree, int, bool *);
@@ -5088,6 +5089,8 @@ const struct attribute_spec cxx_attribute_table[] =
 {
   /* { name, min_len, max_len, decl_req, type_req, fn_type_req,
        affects_type_identity, handler, exclude } */
+  { "java_interface", 0, 0, false, false, false, false,
+    handle_java_interface_attribute, NULL },
   { "init_priority",  1, 1, true,  false, false, false,
     handle_init_priority_attribute, NULL },
   { "abi_tag", 1, -1, false, false, false, true,
@@ -5120,6 +5123,31 @@ const struct attribute_spec std_attribute_table[] =
     handle_contract_attribute, NULL },
   { NULL, 0, 0, false, false, false, false, NULL, NULL }
 };
+
+/* Handle a "java_interface" attribute; arguments as in
+   struct attribute_spec.handler.  */
+static tree
+handle_java_interface_attribute (tree* node,
+				tree name,
+				tree /*args*/,
+				int flags,
+				bool* no_add_attrs)
+{
+  if (DECL_P (*node)
+      || !CLASS_TYPE_P (*node)
+      || !TYPE_FOR_JAVA (*node))
+    {
+      error ("%qE attribute can only be applied to Java class definitions",
+	    name);
+      *no_add_attrs = true;
+      return NULL_TREE;
+    }
+  if (!(flags & (int) ATTR_FLAG_TYPE_IN_PLACE))
+    *node = build_variant_type_copy (*node);
+  TYPE_JAVA_INTERFACE (*node) = 1;
+
+  return NULL_TREE;
+}
 
 /* Handle an "init_priority" attribute; arguments as in
    struct attribute_spec.handler.  */
