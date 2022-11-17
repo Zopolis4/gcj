@@ -1003,7 +1003,7 @@ handle_signature_attribute (int member_index, JCF *jcf,
 			      attribute_length, attr_type);	\
 }
 
-#include "jcf-reader.c"
+#include "jcf-reader.cc"
 
 tree
 parse_signature (JCF *jcf, int sig_index)
