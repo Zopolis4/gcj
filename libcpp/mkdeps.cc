@@ -387,10 +387,8 @@ make_write_vec (const mkdeps::vec<const char *> &vec, FILE *fp,
    .PHONY targets for all the dependencies too.  */
 
 static void
-make_write (const cpp_reader *pfile, FILE *fp, unsigned int colmax)
+make_write (class mkdeps *d, FILE *fp, bool phony, unsigned int colmax)
 {
-  const mkdeps *d = pfile->deps;
-
   unsigned column = 0;
   if (colmax && colmax < 34)
     colmax = 34;
@@ -398,19 +396,16 @@ make_write (const cpp_reader *pfile, FILE *fp, unsigned int colmax)
   if (d->deps.size ())
     {
       column = make_write_vec (d->targets, fp, 0, colmax, d->quote_lwm);
-      if (CPP_OPTION (pfile, deps.modules) && d->cmi_name)
+      if ((d->module_name) && (d->cmi_name))
 	column = make_write_name (d->cmi_name, fp, column, colmax);
       fputs (":", fp);
       column++;
       make_write_vec (d->deps, fp, column, colmax);
       fputs ("\n", fp);
-      if (CPP_OPTION (pfile, deps.phony_targets))
+      if (phony)
 	for (unsigned i = 1; i < d->deps.size (); i++)
 	  fprintf (fp, "%s:\n", munge (d->deps[i]));
     }
-
-  if (!CPP_OPTION (pfile, deps.modules))
-    return;
 
   if (d->modules.size ())
     {
@@ -468,9 +463,9 @@ make_write (const cpp_reader *pfile, FILE *fp, unsigned int colmax)
 /* Really we should be opening fp here.  */
 
 void
-deps_write (const cpp_reader *pfile, FILE *fp, unsigned int colmax)
+deps_write (class mkdeps *d, FILE *fp, bool phony, unsigned int colmax)
 {
-  make_write (pfile, fp, colmax);
+  make_write (d, fp, phony, colmax);
 }
 
 /* Write out a deps buffer to a file, in a form that can be read back
