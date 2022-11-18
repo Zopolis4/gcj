@@ -110,7 +110,7 @@ typedef struct GTY(()) JCF {
   unsigned int right_zip : 1;
   unsigned int finished : 1;
   jcf_filbuf_t filbuf;
-  PTR GTY ((skip)) read_state;
+  void * GTY ((skip)) read_state;
   const char *filename;
   const char *classname;
   /* Directory entry where it was found.  */

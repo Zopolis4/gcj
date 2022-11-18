@@ -1956,7 +1956,7 @@ pop_arguments (tree method_type)
   return args;
 }
 
-/* Attach to PTR (a block) the declaration found in ENTRY. */
+/* Attach to void * (a block) the declaration found in ENTRY. */
 
 int
 attach_init_test_initialization_flags (treetreehash_entry **slot, tree block)
