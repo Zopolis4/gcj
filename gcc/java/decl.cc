@@ -341,7 +341,7 @@ java_replace_references (tree *tp, int *walk_subtrees,
 {
   if (TREE_CODE (*tp) == MODIFY_EXPR)
     {
-      source_location loc = EXPR_LOCATION (*tp);
+      location_t loc = EXPR_LOCATION (*tp);
       tree lhs = TREE_OPERAND (*tp, 0);
       /* This is specific to the bytecode compiler.  If a variable has
 	 LOCAL_SLOT_P set, replace an assignment to it with an assignment
@@ -416,7 +416,7 @@ struct GTY(())
     unsigned binding_depth;
 
     /* The location at which this level began.  */
-    source_location loc;
+    location_t loc;
   };
 
 #define NULL_BINDING_LEVEL (struct binding_level *) NULL
