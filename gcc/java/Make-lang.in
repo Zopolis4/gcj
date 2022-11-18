@@ -150,6 +150,9 @@ java.srcman: $(JAVA_MANFILES)
 check-java :
 check-java-subtargets :
 
+# No Java-specific selftests.
+selftest-java:
+
 # Install hooks:
 # jc1, gcj, and jvgenmain are installed elsewhere as part
 # of $(COMPILERS).
