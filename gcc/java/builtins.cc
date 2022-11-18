@@ -348,7 +348,7 @@ compareAndSwapLong_builtin (tree method_return_type ATTRIBUTE_UNUSED,
      versions.  */
   if (can_compare_and_swap_p (mode,
 			      (flag_use_atomic_builtins
-			       && GET_MODE_SIZE (mode) <= UNITS_PER_WORD)))
+			       && known_le (GET_MODE_SIZE (mode), UNITS_PER_WORD))))
     {
       tree addr, stmt;
       enum built_in_function fncode = BUILT_IN_SYNC_BOOL_COMPARE_AND_SWAP_8;
