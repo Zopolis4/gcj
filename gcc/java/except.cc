@@ -577,7 +577,7 @@ doing_eh (void)
       static int warned = 0;
       if (! warned)
 	{
-	  error ("exception handling disabled, use -fexceptions to enable");
+	  error ("exception handling disabled, use %<-fexceptions%> to enable");
 	  warned = 1;
 	}
       return 0;

@@ -571,7 +571,7 @@ java_post_options (const char **pfilename)
   /* Excess precision other than "fast" requires front-end
      support.  */
   if (flag_excess_precision_cmdline == EXCESS_PRECISION_STANDARD)
-    sorry ("-fexcess-precision=standard for Java");
+    sorry ("%<-fexcess-precision=standard%> for Java");
   flag_excess_precision_cmdline = EXCESS_PRECISION_FAST;
 
   /* An absolute requirement: if we're not using indirect dispatch, we
@@ -582,10 +582,10 @@ java_post_options (const char **pfilename)
   if (flag_reduced_reflection)
     {
       if (flag_indirect_dispatch)
-        error ("-findirect-dispatch is incompatible "
-               "with -freduced-reflection");
+        error ("%<-findirect-dispatch%> is incompatible "
+               "with %<-freduced-reflection%>");
       if (flag_jni)
-        error ("-fjni is incompatible with -freduced-reflection");
+        error ("%<-fjni%> is incompatible with %<-freduced-reflection%>");
     }
 
   /* Open input file.  */
@@ -596,7 +596,7 @@ java_post_options (const char **pfilename)
       filename = "stdin";
 
       if (dependency_tracking)
-	error ("can%'t do dependency tracking with input from stdin");
+	error ("cannot do dependency tracking with input from stdin");
     }
   else
     {
