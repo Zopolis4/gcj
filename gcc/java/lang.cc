@@ -44,7 +44,7 @@ static void java_init_options_struct (struct gcc_options *);
 static void java_init_options (unsigned int, struct cl_decoded_option *);
 static bool java_post_options (const char **);
 
-static bool java_handle_option (size_t, const char *, int, int, location_t,
+static bool java_handle_option (size_t, const char *, HOST_WIDE_INT, int, location_t,
 				const struct cl_option_handlers *);
 static void put_decl_string (const char *, int);
 static void put_decl_node (tree, int);
@@ -171,7 +171,7 @@ struct lang_hooks lang_hooks = LANG_HOOKS_INITIALIZER;
  * return false, but do not complain if the option is not recognized.
  */
 static bool
-java_handle_option (size_t scode, const char *arg, int value,
+java_handle_option (size_t scode, const char *arg, HOST_WIDE_INT value,
 		    int kind ATTRIBUTE_UNUSED, location_t loc ATTRIBUTE_UNUSED,
 		    const struct cl_option_handlers *handlers ATTRIBUTE_UNUSED)
 {
