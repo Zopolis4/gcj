@@ -432,7 +432,8 @@ lang_specific_driver (struct cl_decoded_option **in_decoded_options,
       record_temp_file (filelist_filename, ! saw_save_temps, 0);
       filelist_file = fopen (filelist_filename, "w");
       if (filelist_file == NULL)
-	pfatal_with_name (filelist_filename);
+	fatal_error (input_location, "cannot read spec file %qs: %m", 
+                     filelist_filename);
       num_args -= java_files_count + class_files_count + zip_files_count;
       num_args += 3;  /* for the combined arg "-xjava", and "-xnone" */
     }
@@ -577,7 +578,8 @@ lang_specific_driver (struct cl_decoded_option **in_decoded_options,
   if (combine_inputs)
     {
       if (fclose (filelist_file))
-	pfatal_with_name (filelist_filename);
+	fatal_error (input_location, "cannot read spec file %qs: %m", 
+                     filelist_filename);
     }
 
   /* If we saw no -O or -g option, default to -g1, for javac compatibility. */
