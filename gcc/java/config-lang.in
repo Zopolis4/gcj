@@ -36,5 +36,5 @@ gtfiles="\$(srcdir)/java/java-tree.h \$(srcdir)/java/jcf.h \$(srcdir)/java/parse
 
 target_libs="target-libjava target-libffi target-zlib"
 lang_dirs="fastjar"
-#build_by_default=no
+build_by_default=no
 lang_requires=c++
