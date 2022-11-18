@@ -464,7 +464,7 @@ verify_jvm_instructions_new (JCF *jcf, const unsigned char *byte_ops,
 	  || end_pc < 0 || end_pc > length || start_pc >= end_pc
 	  || handler_pc < 0 || handler_pc >= length)
 	{
-	  error ("bad pc in exception_table");
+	  error ("bad pc in %<exception_table%>");
 	  free (exceptions);
 	  return 0;
 	}

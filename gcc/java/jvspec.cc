@@ -392,7 +392,7 @@ lang_specific_driver (struct cl_decoded_option **in_decoded_options,
     }
 
   if (saw_D && ! main_class_name)
-    fatal_error (input_location, "can%'t specify %<-D%> without %<--main%>");
+    fatal_error (input_location, "cannot specify %<-D%> without %<--main%>");
 
   if (main_class_name && ! verify_class_name (main_class_name))
     fatal_error (input_location,
@@ -402,21 +402,21 @@ lang_specific_driver (struct cl_decoded_option **in_decoded_options,
   if (saw_resource)
     {
       if (! saw_o)
-	fatal_error (input_location, "--resource requires -o");
+	fatal_error (input_location, "%<--resource%> requires %<-o%>");
     }
   if (saw_C)
     {
       num_args += 3;
       if (class_files_count + zip_files_count > 0)
 	{
-	  warning (0, "already-compiled .class files ignored with -C"); 
+	  warning (0, "already-compiled %<.class%> files ignored with %<-C%>"); 
 	  num_args -= class_files_count + zip_files_count;
 	  class_files_count = 0;
 	  zip_files_count = 0;
 	}
       num_args += 2;  /* For -o NONE. */
       if (saw_o)
-	fatal_error (input_location, "cannot specify both -C and -o");
+	fatal_error (input_location, "cannot specify both %<-C%> and %<-o%>");
     }
   if ((saw_o && java_files_count + class_files_count + zip_files_count > 1)
       || (saw_C && java_files_count > 1)

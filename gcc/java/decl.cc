@@ -1617,7 +1617,7 @@ force_poplevels (int start_pc)
   while (current_binding_level->start_pc > start_pc)
     {
       if (pedantic && current_binding_level->start_pc > start_pc)
-	warning (0, "In %+D: overlapped variable and exception ranges at %d",
+	warning (0, "In %<%+D:%> overlapped variable and exception ranges at %d",
                  current_function_decl,
 		 current_binding_level->start_pc);
       poplevel (1, 0, 0);
