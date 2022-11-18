@@ -57,6 +57,7 @@ static bool java_decl_ok_for_sibcall (const_tree);
 static enum classify_record java_classify_record (tree type);
 
 static tree java_eh_personality (void);
+static tree handle_nonnull_attribute (tree *, tree, tree, int, bool *);
 
 #ifndef TARGET_OBJECT_SUFFIX
 # define TARGET_OBJECT_SUFFIX ".o"
@@ -65,9 +66,9 @@ static tree java_eh_personality (void);
 /* Table of machine-independent attributes.  */
 const struct attribute_spec java_attribute_table[] =
 {
- { "nonnull",                0, -1, false, true, true,
-			      NULL, false },
-  { NULL,                     0, 0, false, false, false, NULL, false }
+ { "nonnull",                0, -1, false, true, true, false,
+			      handle_nonnull_attribute, NULL },
+  { NULL,                     0, 0, false, false, false, false, NULL, NULL }
 };
 
 /* Used to avoid printing error messages with bogus function
@@ -907,6 +908,17 @@ java_eh_personality (void)
   if (!java_eh_personality_decl)
     java_eh_personality_decl = build_personality_function ("gcj");
   return java_eh_personality_decl;
+}
+
+/* Handle the "nonnull" attribute.
+   FIXME: Implement an actual function here. */
+
+static tree
+handle_nonnull_attribute
+  (tree ARG_UNUSED (*node), tree ARG_UNUSED (name), tree ARG_UNUSED (args),
+  int ARG_UNUSED (flags), bool ARG_UNUSED (*no_add_attrs))
+{
+  return NULL_TREE;
 }
 
 #include "gt-java-lang.h"
