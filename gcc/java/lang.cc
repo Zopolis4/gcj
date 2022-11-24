@@ -262,8 +262,7 @@ java_handle_option (size_t scode, const char *arg, HOST_WIDE_INT value,
       break;
 
     case OPT_fdump_:
-      if (!g->get_dumps ()->dump_switch_p (arg))
-	return false;
+      g->get_dumps ()->dump_switch_p (arg);
       break;
 
     case OPT_fencoding_:
