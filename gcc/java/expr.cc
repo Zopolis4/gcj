@@ -1887,8 +1887,8 @@ expand_java_switch (tree selector, int default_pc)
   tree switch_expr, x;
 
   flush_quick_stack ();
-  switch_expr = build3 (SWITCH_EXPR, TREE_TYPE (selector), selector,
-			NULL_TREE, NULL_TREE);
+  switch_expr = build2 (SWITCH_EXPR, TREE_TYPE (selector), selector,
+			NULL_TREE);
   java_add_stmt (switch_expr);
 
   x = build_case_label (NULL_TREE, NULL_TREE,
