@@ -1490,7 +1490,7 @@ ZINCS=
 if test -z "$ZLIBSPEC"; then
    # Use zlib from the GCC tree.
    ZINCS='-I$(top_srcdir)/../zlib'
-   ZLIBS=../zlib/libzgcj_convenience.la
+   ZLIBS=../zlib/libz_convenience.la
 else
    # System's zlib.
    SYS_ZLIBS="$ZLIBSPEC"
