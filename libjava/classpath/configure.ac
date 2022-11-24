@@ -74,7 +74,6 @@ AC_SUBST(CLASSPATH_MODULE)
 CLASSPATH_CONVENIENCE="-no-undefined"
 AC_SUBST(CLASSPATH_CONVENIENCE)
 
-AC_PREREQ(2.64)
 AM_INIT_AUTOMAKE([1.9.0 no-dist gnu std-options tar-ustar -Wno-portability])
 AC_CONFIG_HEADERS([include/config.h])
 AC_PREFIX_DEFAULT(/usr/local/classpath)

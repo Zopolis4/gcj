@@ -1,10 +1,7 @@
 dnl # Process this with autoconf to create configure
 
-sinclude(../config/sjlj.m4)
-
-AC_PREREQ(2.64)
 # Still use "libjava" here to placate dejagnu.
-AC_INIT([libjava], [version-unused],, [libjava])
+AC_INIT([libjava], [version-unused], [libjava])
 
 AC_CONFIG_SRCDIR(java/lang/System.java)
 
@@ -22,8 +19,8 @@ AC_ARG_WITH(target-subdir,
 AM_ENABLE_MULTILIB(, ..)
 
 AC_CANONICAL_SYSTEM
-_GCC_TOPLEV_NONCANONICAL_BUILD
-_GCC_TOPLEV_NONCANONICAL_TARGET
+ACX_NONCANONICAL_BUILD
+ACX_NONCANONICAL_TARGET
 
 AC_SUBST(target_noncanonical)
 
@@ -41,9 +38,17 @@ AC_PROG_LN_S
 mkinstalldirs="`cd $ac_aux_dir && ${PWDCMD-pwd}`/mkinstalldirs"
 AC_SUBST(mkinstalldirs)
 
+dnl Default to --enable-multilib
+AC_ARG_ENABLE(multilib,
+[  --enable-multilib       build many library versions (default)],
+[case "${enableval}" in
+  yes) multilib=yes ;;
+  no)  multilib=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for multilib option) ;;
+ esac], [test -z "$with_target_subdir" && multilib=no || multilib=yes])dnl
+
 AC_ARG_WITH(cross-host,
-  AS_HELP_STRING([--with-cross-host=HOST],
-                 [configure with a cross compiler from HOST]))
+[  --with-cross-host=HOST  configuring with a cross compiler])
 
 AC_ARG_WITH(newlib,
   AS_HELP_STRING([--with-newlib],
@@ -147,16 +152,17 @@ AM_CONDITIONAL(JAVA_MAINTAINER_MODE, test "$enable_java_maintainer_mode" = yes)
 # It may not be safe to run linking tests in AC_PROG_CC/AC_PROG_CXX.
 GCC_NO_EXECUTABLES
 
+AM_INIT_AUTOMAKE([no-dist 1.9.0])
+
 # For libstdc++-v3, -fno-builtin must be present here so that a
 # non-conflicting form of std::exit can be guessed by AC_PROG_CXX, and
 # used in later tests.  This may not be necessary in libjava; I don't know.
+
 save_CXXFLAGS="$CXXFLAGS"
 CXXFLAGS="$CXXFLAGS -fno-builtin"
 AC_PROG_CC
 AC_PROG_CXX
 CXXFLAGS="$save_CXXFLAGS"
-
-AM_INIT_AUTOMAKE([no-dist 1.9.0])
 
 AC_CHECK_TOOL(AS, as)
 AC_CHECK_TOOL(LD, ld)
@@ -1732,12 +1738,6 @@ fi
 
 AC_CONFIG_LINKS(include/java-signal.h:$SIGNAL_HANDLER
 		include/java-signal-aux.h:$SIGNAL_HANDLER_AUX)
-
-if test "${multilib}" = "yes"; then
-  multilib_arg="--enable-multilib"
-else
-  multilib_arg=
-fi
 
 # See if we support thread-local storage.
 GCC_CHECK_TLS
