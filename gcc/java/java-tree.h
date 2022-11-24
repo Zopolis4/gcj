@@ -1197,7 +1197,7 @@ int cxx_keyword_p (const char *name, int length);
 
 /* Access flags etc for a method (a FUNCTION_DECL): */
 
-#define METHOD_DUMMY(DECL) (DECL_LANG_SPECIFIC (DECL)->u.f.dummy)
+#define METHOD_DUMMY(DECL) (DECL_LANG_SPECIFIC (FUNCTION_DECL_CHECK (DECL))->u.f.dummy)
 
 #define METHOD_PUBLIC(DECL) DECL_LANG_FLAG_1 (FUNCTION_DECL_CHECK (DECL))
 #define METHOD_PRIVATE(DECL) TREE_PRIVATE (FUNCTION_DECL_CHECK (DECL))
