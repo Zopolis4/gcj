@@ -39,7 +39,7 @@ AM_ENABLE_MULTILIB(, ../..)
 ## Libltdl specific configuration. ##
 ## ------------------------------- ##
 
-AC_CONFIG_AUX_DIR([.])
+AC_CONFIG_AUX_DIR([../..])
 
 if test -z "$enable_ltdl_install$enable_ltdl_convenience"; then
   if test -f ${srcdir}/ltmain.sh; then
