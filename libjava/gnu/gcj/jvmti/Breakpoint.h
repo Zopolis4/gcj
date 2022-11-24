@@ -30,7 +30,7 @@ class gnu::gcj::jvmti::Breakpoint : public ::java::lang::Object
 {
 
 #ifdef DIRECT_THREADED
-friend void (::_Jv_RewriteBreakpointInsn (jmethodID, jlocation, pc_t));
+friend void ::_Jv_RewriteBreakpointInsn (jmethodID, jlocation, pc_t);
 #endif
 
 public:
