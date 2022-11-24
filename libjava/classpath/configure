@@ -17613,13 +17613,6 @@ $as_echo_n "checking whether struct sockaddr_in6 is in netinet/in.h... " >&6; }
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <netinet/in.h>
-int
-main ()
-{
-struct sockaddr_in6 addr6;
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -17779,13 +17772,6 @@ $as_echo_n "checking for tm_gmtoff in struct tm... " >&6; }
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <time.h>
-int
-main ()
-{
-struct tm tim; tim.tm_gmtoff = 0;
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -17801,13 +17787,6 @@ $as_echo_n "checking for global timezone variable... " >&6; }
                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <time.h>
-int
-main ()
-{
-void i(){long z2 = 2*timezone;}
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -17823,13 +17802,6 @@ $as_echo_n "checking for global _timezone variable... " >&6; }
               cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <time.h>
-int
-main ()
-{
-long z2 = _timezone;
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -22205,13 +22177,6 @@ $as_echo_n "checking for MSG_NOSIGNAL... " >&6; }
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <sys/socket.h>
-int
-main ()
-{
- int f = MSG_NOSIGNAL;
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
@@ -22230,13 +22195,6 @@ $as_echo_n "checking for SO_NOSIGPIPE ... " >&6; }
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <sys/socket.h>
-int
-main ()
-{
- int f = SO_NOSIGPIPE;
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
@@ -22255,13 +22213,6 @@ $as_echo_n "checking for MSG_WAITALL... " >&6; }
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <sys/socket.h>
-int
-main ()
-{
- int f = MSG_WAITALL;
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
@@ -25591,7 +25542,7 @@ else
 JAVA_TEST=Object.java
 CLASS_TEST=Object.class
 cat << \EOF > $JAVA_TEST
-/* #line 25594 "configure" */
+/* #line 25545 "configure" */
 package java.lang;
 
 public class Object
@@ -25684,7 +25635,7 @@ EOF
 if uudecode$EXEEXT Test.uue; then
         ac_cv_prog_uudecode_base64=yes
 else
-        echo "configure: 25687: uudecode had trouble decoding base 64 file 'Test.uue'" >&5
+        echo "configure: 25638: uudecode had trouble decoding base 64 file 'Test.uue'" >&5
         echo "configure: failed file was:" >&5
         cat Test.uue >&5
         ac_cv_prog_uudecode_base64=no
@@ -25712,7 +25663,7 @@ JAVA_TEST=Test.java
 CLASS_TEST=Test.class
 TEST=Test
 cat << \EOF > $JAVA_TEST
-/* [#]line 25715 "configure" */
+/* [#]line 25666 "configure" */
 public class Test {
 public static void main (String args[]) {
         System.exit (0);
@@ -25920,7 +25871,7 @@ if test "x${use_glibj_zip}" = xfalse || \
   JAVA_TEST=Test.java
   CLASS_TEST=Test.class
   cat << \EOF > $JAVA_TEST
-  /* #line 25923 "configure" */
+  /* #line 25874 "configure" */
   public class Test
   {
     public static void main(String args)

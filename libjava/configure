@@ -22238,13 +22238,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 	  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <netdb.h>
-int
-main ()
-{
-gethostbyname_r("", 0, 0);
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
   libjava_cv_gethostbyname_r_needs_reentrant=no
@@ -22254,13 +22247,6 @@ else
 		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <netdb.h>
-int
-main ()
-{
-gethostbyname_r("", 0, 0);
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
   libjava_cv_gethostbyname_r_needs_reentrant=yes
@@ -22295,7 +22281,14 @@ $as_echo_n "checking for struct hostent_data... " >&6; }
 if ${libjava_cv_struct_hostent_data+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 #if GETHOSTBYNAME_R_NEEDS_REENTRANT && !defined(_REENTRANT)
@@ -22310,7 +22303,7 @@ struct hostent_data data;
   return 0;
 }
 _ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
+if ac_fn_cxx_try_compile "$LINENO"; then :
   libjava_cv_struct_hostent_data=yes
 else
   libjava_cv_struct_hostent_data=no
@@ -22324,6 +22317,12 @@ $as_echo "$libjava_cv_struct_hostent_data" >&6; }
 $as_echo "#define HAVE_STRUCT_HOSTENT_DATA 1" >>confdefs.h
 
      fi
+   ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
 
 fi
 done
@@ -22611,15 +22610,6 @@ fi
       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <pthread.h>
-int
-main ()
-{
-
-          extern pthread_mutex_t *mutex; int q = mutex->m_count;
-
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -22630,15 +22620,6 @@ else
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <pthread.h>
-int
-main ()
-{
-
-	    extern pthread_mutex_t *mutex; int q = mutex->__m_count;
-
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -24318,20 +24299,13 @@ $as_echo_n "checking for in_addr_t... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <sys/types.h>
-#if STDC_HEADERS
+#ifdef STDC_HEADERS
 #include <stdlib.h>
 #include <stddef.h>
 #endif
-#if HAVE_NETINET_IN_H
+#ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
-int
-main ()
-{
-in_addr_t foo;
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -24350,13 +24324,6 @@ $as_echo_n "checking whether struct ip_mreq is in netinet/in.h... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <netinet/in.h>
-int
-main ()
-{
-struct ip_mreq mreq;
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -24375,13 +24342,6 @@ $as_echo_n "checking whether struct ipv6_mreq is in netinet/in.h... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <netinet/in.h>
-int
-main ()
-{
-struct ipv6_mreq mreq6;
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -24400,13 +24360,6 @@ $as_echo_n "checking whether struct sockaddr_in6 is in netinet/in.h... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <netinet/in.h>
-int
-main ()
-{
-struct sockaddr_in6 addr6;
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -24427,13 +24380,6 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #define _POSIX_PII_SOCKET
 #include <sys/types.h>
 #include <sys/socket.h>
-int
-main ()
-{
-socklen_t x = 5;
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -24452,13 +24398,6 @@ $as_echo_n "checking for tm_gmtoff in struct tm... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <time.h>
-int
-main ()
-{
-struct tm tim; tim.tm_gmtoff = 0;
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -24474,13 +24413,6 @@ $as_echo_n "checking for global timezone variable... " >&6; }
                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <time.h>
-int
-main ()
-{
-void i(){long z2 = 2*timezone;}
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
@@ -24496,13 +24428,6 @@ $as_echo_n "checking for global _timezone variable... " >&6; }
               cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <time.h>
-int
-main ()
-{
-long z2 = _timezone;
-  ;
-  return 0;
-}
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
