@@ -368,7 +368,7 @@ _Jv_GetStringUTFRegion (jstring str, jsize start, jsize len, char *buf)
 jint
 _Jv_FormatInt (jchar* bufend, jint num)
 {
-  register jchar* ptr = bufend;
+  jchar* ptr = bufend;
   jboolean isNeg;
   if (num < 0)
     {
