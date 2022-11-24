@@ -1668,7 +1668,7 @@ Optional Features:
   --enable-regen-gjdoc-parser
                           automatically regenerate the GJDoc parser
                           default=yes if generated source doesn't exist
-  --enable-tool-wrappers  create tool wrapper binaries default=no
+  --enable-tool-wrappers  create tool wrapper binaries default=yes
   --enable-static[=PKGS]  build static libraries [default=no]
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -12513,6 +12513,23 @@ CC="$lt_save_CC"
 
 # Only expand once:
 
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking what variable specifies run-time module search path" >&5
+$as_echo_n "checking what variable specifies run-time module search path... " >&6; }
+if ${lt_cv_module_path_var+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  lt_cv_module_path_var=$shlibpath_var
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_module_path_var" >&5
+$as_echo "$lt_cv_module_path_var" >&6; }
+if test -n "$lt_cv_module_path_var"; then
+
+cat >>confdefs.h <<_ACEOF
+#define LT_MODULE_PATH_VAR "$lt_cv_module_path_var"
+_ACEOF
+
+fi
 
 for ac_prog in gawk mawk nawk awk
 do
@@ -25542,7 +25559,7 @@ else
 JAVA_TEST=Object.java
 CLASS_TEST=Object.class
 cat << \EOF > $JAVA_TEST
-/* #line 25545 "configure" */
+/* #line 25562 "configure" */
 package java.lang;
 
 public class Object
@@ -25635,7 +25652,7 @@ EOF
 if uudecode$EXEEXT Test.uue; then
         ac_cv_prog_uudecode_base64=yes
 else
-        echo "configure: 25638: uudecode had trouble decoding base 64 file 'Test.uue'" >&5
+        echo "configure: 25655: uudecode had trouble decoding base 64 file 'Test.uue'" >&5
         echo "configure: failed file was:" >&5
         cat Test.uue >&5
         ac_cv_prog_uudecode_base64=no
@@ -25663,7 +25680,7 @@ JAVA_TEST=Test.java
 CLASS_TEST=Test.class
 TEST=Test
 cat << \EOF > $JAVA_TEST
-/* [#]line 25666 "configure" */
+/* [#]line 25683 "configure" */
 public class Test {
 public static void main (String args[]) {
         System.exit (0);
@@ -25871,7 +25888,7 @@ if test "x${use_glibj_zip}" = xfalse || \
   JAVA_TEST=Test.java
   CLASS_TEST=Test.class
   cat << \EOF > $JAVA_TEST
-  /* #line 25874 "configure" */
+  /* #line 25891 "configure" */
   public class Test
   {
     public static void main(String args)

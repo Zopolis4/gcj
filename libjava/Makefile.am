@@ -2,13 +2,13 @@
 
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
-ACLOCAL_AMFLAGS = -I . -I .. -I ../config -I libltdl
+ACLOCAL_AMFLAGS = -I . -I .. -I ../config
 
 # May be used by various substitution variables.
 gcc_version := $(shell cat $(top_srcdir)/../gcc/BASE-VER)
 export gcc_version
 
-SUBDIRS = $(DIRLTDL) gcj include classpath
+SUBDIRS = gcj include classpath
 if TESTSUBDIR
 SUBDIRS += testsuite
 endif
@@ -411,7 +411,7 @@ AM_CPPFLAGS = -I$(top_srcdir) \
 	-I$(top_srcdir)/classpath/include \
 	-Iclasspath/include \
 	-I$(top_srcdir)/classpath/native/fdlibm \
-	$(GCINCS) $(THREADINCS) $(INCLTDL) \
+	$(GCINCS) $(THREADINCS) $(LTDLINCL) \
 	$(LIBGCC_UNWIND_INCLUDE) $(ZINCS) $(LIBFFIINCS)
 
 BOOTCLASSPATH = $(srcdir)/classpath/lib

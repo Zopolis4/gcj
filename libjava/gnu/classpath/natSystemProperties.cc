@@ -40,7 +40,6 @@ details.  */
 
 char *_Jv_Module_Load_Path = NULL;
 
-#ifdef USE_LTDL
 #include <ltdl.h>
 
 void
@@ -48,16 +47,6 @@ _Jv_SetDLLSearchPath (const char *path)
 {
   _Jv_Module_Load_Path = strdup (path);
 }
-
-#else
-
-void
-_Jv_SetDLLSearchPath (const char *)
-{
-  // Nothing.
-}
-
-#endif /* USE_LTDL */
 
 #if ! defined (DEFAULT_FILE_ENCODING) && defined (HAVE_ICONV) \
     && defined (HAVE_NL_LANGINFO)
@@ -379,15 +368,11 @@ gnu::classpath::SystemProperties::insertSystemProperties (::java::util::Properti
   else
     {
       // Set a value for user code to see.
-#ifdef USE_LTDL
-      char *libpath = getenv (LTDL_SHLIBPATH_VAR);
+      char *libpath = getenv (LT_MODULE_PATH_VAR);
       char* val = _Jv_PrependVersionedLibdir (libpath);
       SET ("java.library.path", val);
       _Jv_SetDLLSearchPath (val);
       _Jv_Free (val);
-#else
-      SET ("java.library.path", "");
-#endif
     }
 
   // If java.class.path is still not set then set it according to the

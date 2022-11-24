@@ -418,10 +418,10 @@ AC_MSG_RESULT(${REGENERATE_GJDOC_PARSER})
 AM_CONDITIONAL(CREATE_GJDOC_PARSER, test "x${REGENERATE_GJDOC_PARSER}" = xyes)
 
 dnl -----------------------------------------------------------
-dnl Enable tool wrapper binaries (disabled by default)
+dnl Enable tool wrapper binaries
 dnl -----------------------------------------------------------
 AC_ARG_ENABLE([tool-wrappers],
-              [AS_HELP_STRING(--enable-tool-wrappers,create tool wrapper binaries [default=no])],
+              [AS_HELP_STRING(--enable-tool-wrappers,create tool wrapper binaries [default=yes])],
               [case x"${enableval}" in
                 xyes)
                   COMPILE_WRAPPERS=yes;
@@ -445,6 +445,7 @@ dnl -----------------------------------------------------------
 dnl Initialize libtool
 AC_DISABLE_STATIC
 LT_INIT
+LT_SYS_MODULE_PATH
 AC_PROG_AWK
 AC_PROG_CC
 AM_PROG_CC_C_O

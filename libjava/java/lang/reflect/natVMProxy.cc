@@ -208,7 +208,7 @@ java::lang::reflect::VMProxy::generateProxyClass
 
 // Box things with primitive types.
 static inline jobject
-box (void *thing, jclass klass, FFI_TYPE type)
+box (void *thing, jclass klass, unsigned type)
 {
   jobject o;
 
@@ -250,7 +250,7 @@ box (void *thing, jclass klass, FFI_TYPE type)
 
 // Unbox things with primitive types.
 static inline void
-unbox (jobject o, jclass klass, void *rvalue, FFI_TYPE type)
+unbox (jobject o, jclass klass, void *rvalue, unsigned type)
 {
   switch (type)
     {
