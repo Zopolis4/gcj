@@ -34,6 +34,7 @@ The Free Software Foundation is independent of Sun Microsystems, Inc.  */
 #include "tree.h"
 #include "stringpool.h"
 #include "expmed.h"
+#include "memmodel.h"
 #include "optabs.h"
 #include "fold-const.h"
 #include "stor-layout.h"
