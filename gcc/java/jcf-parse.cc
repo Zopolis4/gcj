@@ -1992,8 +1992,8 @@ compute_class_name (struct ZipDirectory *zdir)
 {
   char *class_name_in_zip_dir = ZIPDIR_FILENAME (zdir);
   char *class_name;
-  int i;
-  int filename_length = zdir->filename_length;
+  size_t i;
+  size_t filename_length = zdir->filename_length;
 
   while (filename_length > 2 && strncmp (class_name_in_zip_dir, "./", 2) == 0)
     {
@@ -2002,15 +2002,20 @@ compute_class_name (struct ZipDirectory *zdir)
     }
 
   filename_length -= strlen (".class");
-  class_name = XNEWVEC (char, filename_length + 1);
-  memcpy (class_name, class_name_in_zip_dir, filename_length);
-  class_name [filename_length] = '\0';
+  if (filename_length > 0)
+  {
+    class_name = XNEWVEC (char, size_t(filename_length + 1));
+    memcpy (class_name, class_name_in_zip_dir, filename_length);
+    class_name [filename_length] = '\0';
 
-  for (i = 0; i < filename_length; i++)
-    if (class_name[i] == '/')
-      class_name[i] = '.';
+    for (i = 0; i < filename_length; i++)
+      if (class_name[i] == '/')
+        class_name[i] = '.';
 
-  return class_name;
+    return class_name;
+  }
+
+  return 0;
 }
 
 /* Return 0 if we should skip this entry, 1 if it is a .class file, 2
