@@ -160,7 +160,7 @@ static void
 dump_java_tree (enum tree_dump_index phase, tree t)
 {
   FILE *stream;
-  int flags;
+  dump_flags_t flags;
 
   stream = dump_begin (phase, &flags);
   flags |= TDF_SLIM;
