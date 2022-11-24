@@ -481,7 +481,8 @@ push_promoted_type (const char *name, tree actual_type)
   TYPE_MAX_VALUE (type) = copy_node (in_max);
   TREE_TYPE (TYPE_MAX_VALUE (type)) = type;
   TYPE_PRECISION (type) = TYPE_PRECISION (int_type_node);
-  TYPE_STRING_FLAG (type) = TYPE_STRING_FLAG (actual_type);
+  if (TREE_CODE (type) == ARRAY_TYPE || TREE_CODE (type) == INTEGER_TYPE)
+    TYPE_STRING_FLAG (type) = TYPE_STRING_FLAG (actual_type);
   layout_type (type);
   pushdecl (build_decl (input_location,
 			TYPE_DECL, get_identifier (name), type));
