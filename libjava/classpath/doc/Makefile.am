@@ -3,12 +3,12 @@ SUBDIRS = api
 EXTRA_DIST = README.jaxp texi2pod.pl $(man_MANS)
 
 ## GCJ LOCAL: we don't want to install all of Classpath's info files.
-## info_TEXINFOS = cp-hacking.texinfo cp-vmintegration.texinfo cp-tools.texinfo
+## info_TEXINFOS = cp-hacking.texi cp-vmintegration.texi cp-tools.texi
 TEXINFO_TEX = ../../gcc/doc/include/texinfo.tex
-info_TEXINFOS = cp-tools.texinfo
+info_TEXINFOS = cp-tools.texi
 
 # POSIX locale necessary to make grep work; see http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=586134
-.texinfo.dvi:
+.texi.dvi:
 	LC_ALL=POSIX texi2dvi --build-dir=$(builddir) -o $@ $<
 
 .dvi.ps:
@@ -46,47 +46,47 @@ STAMP = echo timestamp >
 	gkeytool.pod gnative2ascii.pod gorbd.pod grmid.pod grmiregistry.pod \
 	gserialver.pod gtnameserv.pod gcjh.pod gjdoc.pod
 
-gappletviewer.pod: $(srcdir)/cp-tools.texinfo
+gappletviewer.pod: $(srcdir)/cp-tools.texi
 	-$(TEXI2POD) -D gappletviewer < $< > $@
 
-gjarsigner.pod: $(srcdir)/cp-tools.texinfo
+gjarsigner.pod: $(srcdir)/cp-tools.texi
 	-$(TEXI2POD) -D gjarsigner < $< > $@
 
-gjar.pod: $(srcdir)/cp-tools.texinfo
+gjar.pod: $(srcdir)/cp-tools.texi
 	-$(TEXI2POD) -D gjar < $< > $@
 
-gcjh.pod: $(srcdir)/cp-tools.texinfo
+gcjh.pod: $(srcdir)/cp-tools.texi
 	-$(TEXI2POD) -D gcjh < $< > $@
 
-gjavah.pod: $(srcdir)/cp-tools.texinfo
+gjavah.pod: $(srcdir)/cp-tools.texi
 	-$(TEXI2POD) -D gjavah < $< > $@
 
 # hack around the cross references and the enumeration
-gkeytool.pod: $(srcdir)/cp-tools.texinfo
+gkeytool.pod: $(srcdir)/cp-tools.texi
 	-$(TEXI2POD) -D gkeytool < $< \
 	  | sed -e 's/^For more details.*/See I<Common Options> for more details./' \
 	    -e 's/1\.<\([^>]*\)>/- \1/' \
 		> $@
 
-gnative2ascii.pod: $(srcdir)/cp-tools.texinfo
+gnative2ascii.pod: $(srcdir)/cp-tools.texi
 	-$(TEXI2POD) -D gnative2ascii < $< > $@
 
-gorbd.pod: $(srcdir)/cp-tools.texinfo
+gorbd.pod: $(srcdir)/cp-tools.texi
 	-$(TEXI2POD) -D gorbd < $< > $@
 
-grmid.pod: $(srcdir)/cp-tools.texinfo
+grmid.pod: $(srcdir)/cp-tools.texi
 	-$(TEXI2POD) -D grmid < $< > $@
 
-grmiregistry.pod: $(srcdir)/cp-tools.texinfo
+grmiregistry.pod: $(srcdir)/cp-tools.texi
 	-$(TEXI2POD) -D grmiregistry < $< > $@
 
-gserialver.pod: $(srcdir)/cp-tools.texinfo
+gserialver.pod: $(srcdir)/cp-tools.texi
 	-$(TEXI2POD) -D gserialver < $< > $@
 
-gtnameserv.pod: $(srcdir)/cp-tools.texinfo
+gtnameserv.pod: $(srcdir)/cp-tools.texi
 	-$(TEXI2POD) -D gtnameserv < $< > $@
 
-gjdoc.pod: $(srcdir)/cp-tools.texinfo
+gjdoc.pod: $(srcdir)/cp-tools.texi
 	-$(TEXI2POD) -D gjdoc < $< > $@
 
 # GCJ LOCAL CHANGE
