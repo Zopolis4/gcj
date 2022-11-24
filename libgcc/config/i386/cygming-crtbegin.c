@@ -73,6 +73,18 @@ __deregister_frame_info (__attribute__((unused)) const void *p)
 #endif
 #endif /* DWARF2_UNWIND_INFO */
 
+#if TARGET_USE_JCR_SECTION
+extern void _Jv_RegisterClasses (__attribute__((unused)) const void *)
+  TARGET_ATTRIBUTE_WEAK;
+
+#ifdef __x86_64__
+TARGET_ATTRIBUTE_WEAK void
+_Jv_RegisterClasses (__attribute__((unused)) const void *p)
+{
+}
+#endif
+#endif /* TARGET_USE_JCR_SECTION */
+
 #if defined(HAVE_LD_RO_RW_SECTION_MIXING)
 # define EH_FRAME_SECTION_CONST const
 #else
