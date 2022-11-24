@@ -50,12 +50,12 @@ details.  */
 
 
 
-#ifdef USE_LTDL
 #include <ltdl.h>
 
 /* FIXME: we don't always need this.  The next libtool will let us use
    AC_LTDL_PREOPEN to see if we do.  */
 extern const lt_dlsymlist lt_preloaded_symbols[1] = { { 0, 0 } };
+static lt_dlinterface_id iface_id = 0;
 
 struct lookup_data
 {
@@ -77,19 +77,9 @@ _Jv_FindSymbolInExecutable (const char *symname)
   lookup_data data;
   data.symname = symname;
   data.result = NULL;
-  lt_dlforeach (find_symbol, (lt_ptr) &data);
+  lt_dlhandle_map (iface_id, find_symbol, (lt_ptr) &data);
   return data.result;
 }
-
-#else
-
-void *
-_Jv_FindSymbolInExecutable (const char *)
-{
-  return NULL;
-}
-
-#endif /* USE_LTDL */
 
 
 
@@ -122,17 +112,14 @@ java::lang::Runtime::gc (void)
   _Jv_RunGC ();
 }
 
-#ifdef USE_LTDL
 // List of names for JNI_OnLoad.
 static const char *onload_names[] = _Jv_platform_onload_names;
-#endif
 
 void
 java::lang::Runtime::_load (jstring path, jboolean do_search)
 {
   JvSynchronize sync (this);
   using namespace java::lang;
-#ifdef USE_LTDL
   jint len = _Jv_GetStringUTFLength (path);
   char buf[len + 1 + strlen (_Jv_platform_solib_prefix)
 	   + strlen (_Jv_platform_solib_suffix)];
@@ -222,12 +209,6 @@ java::lang::Runtime::_load (jstring path, jboolean do_search)
 	  throw new UnsatisfiedLinkError (JvNewStringLatin1 ("unrecognized version from JNI_OnLoad"));
 	}
     }
-#else
-  throw new UnknownError
-    (JvNewStringLatin1 (do_search
-			? "Runtime.loadLibrary not implemented"
-			: "Runtime.load not implemented"));
-#endif /* USE_LTDL */
 }
 
 jboolean
@@ -235,7 +216,6 @@ java::lang::Runtime::loadLibraryInternal (jstring lib)
 {
   JvSynchronize sync (this);
   using namespace java::lang;
-#ifdef USE_LTDL
   jint len = _Jv_GetStringUTFLength (lib);
   char buf[len + 1];
   jsize total = JvGetStringUTFRegion (lib, 0, lib->length(), buf);
@@ -243,21 +223,18 @@ java::lang::Runtime::loadLibraryInternal (jstring lib)
   // FIXME: make sure path is absolute.
   lt_dlhandle h = lt_dlopenext (buf);
   return h != NULL;
-#else
-  return false;
-#endif /* USE_LTDL */
 }
 
 void
 java::lang::Runtime::init (void)
 {
-#ifdef USE_LTDL
   lt_dlinit ();
   // Set module load path.
   lt_dlsetsearchpath (_Jv_Module_Load_Path);
   // Make sure self is opened.
   lt_dlopen (NULL);
-#endif
+
+  iface_id = lt_dlinterface_register("id_string", NULL);
 }
 
 void

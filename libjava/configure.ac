@@ -252,11 +252,6 @@ AC_SUBST(LIBGCJ_LD_SYMBOLIC)
 AC_SUBST(LIBGCJ_LD_SYMBOLIC_FUNCTIONS)
 AC_SUBST(LIBGCJ_LD_EXPORT_ALL)
 
-# Only use libltdl for non-newlib builds.
-if test "x${with_newlib}" = "x" || test "x${with_newlib}" = "xno"; then
-   AC_LTDL_SHLIBPATH
-fi
-
 AC_CONFIG_HEADERS([include/config.h gcj/libgcj-config.h])
 
 # Possibly build libgcj as many sub-libraries.
@@ -503,8 +498,6 @@ test -f libgcj.spec || touch libgcj.spec
 
 # Set up to configure Classpath.
 # FIXME: no supported way to pass args in autoconf.
-# Disable tool wrappers to avoid ltdl.h configure check.
-ac_configure_args="$ac_configure_args --disable-tool-wrappers"
 ac_configure_args="$ac_configure_args --disable-load-library"
 ac_configure_args="$ac_configure_args --${LIBGCJDEBUG}-debug"
 ac_configure_args="$ac_configure_args --enable-default-toolkit=$TOOLKIT"
@@ -554,27 +547,22 @@ dnl --with-javah=$GCJH
 dnl gtk-cairo -- just export here...
 dnl --enable-regen-headers?
 
-# Only use libltdl for non-newlib builds.
-if test "x${with_newlib}" = "x" || test "x${with_newlib}" = "xno"; then
-   AC_LIBLTDL_CONVENIENCE
-   AC_LIBTOOL_DLOPEN
-   DIRLTDL=libltdl
-   AC_DEFINE(USE_LTDL, 1, [Define if libltdl is in use.])
-   # Sigh.  Libtool's macro doesn't do the right thing.
-   INCLTDL="-I\$(top_srcdir)/libltdl $INCLTDL"
-   # FIXME: this is a hack.
-   sub_auxdir="`cd $ac_aux_dir && ${PWDCMD-pwd}`"
-   ac_configure_args="$ac_configure_args --with-auxdir=$sub_auxdir"
+LT_INIT([dlopen])
+AC_CHECK_HEADERS(ltdl.h)
+if test "$ac_cv_header_ltdl_h" = "no"; then
+  AC_MSG_ERROR(cannot find ltdl.h)
 fi
-AC_SUBST(INCLTDL)
+
+LTDL_INIT()
+AC_CHECK_LIB([ltdl], [lt_dlhandle_map], [], [AC_MSG_ERROR([installed libltdl is too old])])
+AC_SUBST(LTDLINCL)
 AC_SUBST(LIBLTDL)
-AC_SUBST(DIRLTDL)
-AC_PROG_LIBTOOL
+LT_SYS_MODULE_PATH
 ACX_LT_HOST_FLAGS
 AM_PROG_GCJ
 AM_PROG_CC_C_O
 
-AC_CONFIG_SUBDIRS(classpath libltdl)
+AC_CONFIG_SUBDIRS(classpath)
 
 # The -no-testsuite modules omit the test subdir.
 AM_CONDITIONAL(TESTSUBDIR, test -d $srcdir/testsuite)
@@ -749,6 +737,7 @@ if test "$with_libffi" != no; then
 fi
 AC_SUBST(LIBFFI)
 AC_SUBST(LIBFFIINCS)
+AM_CONDITIONAL(USE_LIBFFI, test "$with_libffi" != "no")
 
 # See if the user wants to disable JVMPI support.
 AC_ARG_ENABLE(jvmpi,

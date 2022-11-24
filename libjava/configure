@@ -565,6 +565,10 @@ as_tr_sh="eval sed 'y%*+%pp%;s%[^_$as_cr_alnum]%_%g'"
 
 SHELL=${CONFIG_SHELL-/bin/sh}
 
+lt_ltdl_dir='libltdl'
+
+lt_dlopen_dir=$lt_ltdl_dir
+
 
 test -n "$DJDIR" || exec 7<&0 </dev/null
 exec 6>&1
@@ -632,7 +636,9 @@ ac_includes_default="\
 #endif"
 
 enable_option_checking=no
-ac_subst_vars='am__EXEEXT_FALSE
+ac_subst_vars='ltdl_LTLIBOBJS
+ltdl_LIBOBJS
+am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
@@ -759,6 +765,8 @@ USING_POSIX_PLATFORM_TRUE
 USING_WIN32_PLATFORM_FALSE
 USING_WIN32_PLATFORM_TRUE
 PLATFORM
+USE_LIBFFI_FALSE
+USE_LIBFFI_TRUE
 LIBFFIINCS
 LIBFFI
 INTERPRETER_FALSE
@@ -779,7 +787,6 @@ ECJ_JAR
 ECJ_BUILD_JAR
 TESTSUBDIR_FALSE
 TESTSUBDIR_TRUE
-subdirs
 am__fastdepGCJ_FALSE
 am__fastdepGCJ_TRUE
 GCJDEPMODE
@@ -787,6 +794,25 @@ GCJFLAGS
 ac_ct_GCJ
 GCJ
 lt_host_flags
+LTDLOPEN
+LT_CONFIG_H
+subdirs
+CONVENIENCE_LTDL_FALSE
+CONVENIENCE_LTDL_TRUE
+INSTALL_LTDL_FALSE
+INSTALL_LTDL_TRUE
+LT_ARGZ_H
+sys_symbol_underscore
+LIBADD_DL
+LT_DLPREOPEN
+LIBADD_DLD_LINK
+LIBADD_SHL_LOAD
+LIBADD_DLOPEN
+LT_DLLOADERS
+INCLTDL
+LTDLINCL
+LTDLDEPS
+LIBLTDL
 CXXCPP
 CPP
 OTOOL64
@@ -803,9 +829,6 @@ EGREP
 GREP
 SED
 LIBTOOL
-DIRLTDL
-LIBLTDL
-INCLTDL
 host_exeext
 GCJH
 GCC_FOR_ECJX
@@ -980,6 +1003,10 @@ with_pic
 enable_fast_install
 with_gnu_ld
 enable_libtool_lock
+with_included_ltdl
+with_ltdl_include
+with_ltdl_lib
+enable_ltdl_install
 enable_getenv_properties
 enable_hash_synchronization
 with_ecj_jar
@@ -1027,7 +1054,8 @@ CCC
 CPP
 CXXCPP
 XMKMF'
-ac_subdirs_all='classpath libltdl'
+ac_subdirs_all='libltdl
+classpath'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -1677,6 +1705,7 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --enable-ltdl-install   install libltdl
   --disable-getenv-properties
                           don't set system properties from GCJ_PROPERTIES
   --enable-hash-synchronization
@@ -1712,6 +1741,9 @@ Optional Packages:
   --with-pic              try to use only PIC/non-PIC objects [default=use
                           both]
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
+  --with-included-ltdl    use the GNU ltdl sources included here
+  --with-ltdl-include=DIR use the ltdl headers installed in DIR
+  --with-ltdl-lib=DIR     use the libltdl.la installed in DIR
   --with-ecj-jar=FILE     use preinstalled ecj jar
   --with-java-home=DIRECTORY
                           value of java.home system property
@@ -2311,6 +2343,106 @@ fi
 
 } # ac_fn_c_check_header_mongrel
 
+# ac_fn_c_check_decl LINENO SYMBOL VAR INCLUDES
+# ---------------------------------------------
+# Tests whether SYMBOL is declared in INCLUDES, setting cache variable VAR
+# accordingly.
+ac_fn_c_check_decl ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  as_decl_name=`echo $2|sed 's/ *(.*//'`
+  as_decl_use=`echo $2|sed -e 's/(/((/' -e 's/)/) 0&/' -e 's/,/) 0& (/g'`
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $as_decl_name is declared" >&5
+$as_echo_n "checking whether $as_decl_name is declared... " >&6; }
+if eval \${$3+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main ()
+{
+#ifndef $as_decl_name
+#ifdef __cplusplus
+  (void) $as_decl_use;
+#else
+  (void) $as_decl_name;
+#endif
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  eval "$3=yes"
+else
+  eval "$3=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_c_check_decl
+
+# ac_fn_c_check_type LINENO TYPE VAR INCLUDES
+# -------------------------------------------
+# Tests whether TYPE exists after having included INCLUDES, setting cache
+# variable VAR accordingly.
+ac_fn_c_check_type ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+$as_echo_n "checking for $2... " >&6; }
+if eval \${$3+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  eval "$3=no"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main ()
+{
+if (sizeof ($2))
+	 return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main ()
+{
+if (sizeof (($2)))
+	    return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+else
+  eval "$3=yes"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_c_check_type
+
 # ac_fn_c_check_member LINENO AGGR MEMBER VAR INCLUDES
 # ----------------------------------------------------
 # Tries to find if the field MEMBER exists in type AGGR, after including
@@ -2367,52 +2499,6 @@ $as_echo "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_c_check_member
-
-# ac_fn_c_check_decl LINENO SYMBOL VAR INCLUDES
-# ---------------------------------------------
-# Tests whether SYMBOL is declared in INCLUDES, setting cache variable VAR
-# accordingly.
-ac_fn_c_check_decl ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  as_decl_name=`echo $2|sed 's/ *(.*//'`
-  as_decl_use=`echo $2|sed -e 's/(/((/' -e 's/)/) 0&/' -e 's/,/) 0& (/g'`
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $as_decl_name is declared" >&5
-$as_echo_n "checking whether $as_decl_name is declared... " >&6; }
-if eval \${$3+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main ()
-{
-#ifndef $as_decl_name
-#ifdef __cplusplus
-  (void) $as_decl_use;
-#else
-  (void) $as_decl_name;
-#endif
-#endif
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  eval "$3=yes"
-else
-  eval "$3=no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-eval ac_res=\$$3
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-} # ac_fn_c_check_decl
 
 # ac_fn_c_compute_int LINENO EXPR VAR INCLUDES
 # --------------------------------------------
@@ -2596,60 +2682,6 @@ rm -f conftest.val
   as_fn_set_status $ac_retval
 
 } # ac_fn_c_compute_int
-
-# ac_fn_c_check_type LINENO TYPE VAR INCLUDES
-# -------------------------------------------
-# Tests whether TYPE exists after having included INCLUDES, setting cache
-# variable VAR accordingly.
-ac_fn_c_check_type ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
-$as_echo_n "checking for $2... " >&6; }
-if eval \${$3+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  eval "$3=no"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main ()
-{
-if (sizeof ($2))
-	 return 0;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main ()
-{
-if (sizeof (($2)))
-	    return 0;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-
-else
-  eval "$3=yes"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-eval ac_res=\$$3
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-} # ac_fn_c_check_type
 cat >config.log <<_ACEOF
 This file contains any messages produced by compilers while
 running configure, to aid debugging if configure makes a mistake.
@@ -6251,539 +6283,6 @@ LIBGCJ_LD_EXPORT_ALL="${libgcj_ld_export_all}"
 
 
 
-# Only use libltdl for non-newlib builds.
-if test "x${with_newlib}" = "x" || test "x${with_newlib}" = "xno"; then
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking dynamic linker characteristics" >&5
-$as_echo_n "checking dynamic linker characteristics... " >&6; }
-library_names_spec=
-libname_spec='lib$name'
-soname_spec=
-shrext=".so"
-postinstall_cmds=
-postuninstall_cmds=
-finish_cmds=
-finish_eval=
-shlibpath_var=
-shlibpath_overrides_runpath=unknown
-version_type=none
-dynamic_linker="$host_os ld.so"
-sys_lib_dlsearch_path_spec="/lib /usr/lib"
-if test "$GCC" = yes; then
-  sys_lib_search_path_spec=`$CC -print-search-dirs | grep "^libraries:" | sed -e "s/^libraries://" -e "s,=/,/,g"`
-  if echo "$sys_lib_search_path_spec" | grep ';' >/dev/null ; then
-    # if the path contains ";" then we assume it to be the separator
-    # otherwise default to the standard path separator (i.e. ":") - it is
-    # assumed that no part of a normal pathname contains ";" but that should
-    # okay in the real world where ";" in dirpaths is itself problematic.
-    sys_lib_search_path_spec=`echo "$sys_lib_search_path_spec" | sed -e 's/;/ /g'`
-  else
-    sys_lib_search_path_spec=`echo "$sys_lib_search_path_spec" | sed -e "s/$PATH_SEPARATOR/ /g"`
-  fi
-else
-  sys_lib_search_path_spec="/lib /usr/lib /usr/local/lib"
-fi
-need_lib_prefix=unknown
-hardcode_into_libs=no
-
-# when you set need_version to no, make sure it does not cause -set_version
-# flags to be left without arguments
-need_version=unknown
-
-case $host_os in
-aix3*)
-  version_type=linux
-  library_names_spec='${libname}${release}${shared_ext}$versuffix $libname.a'
-  shlibpath_var=LIBPATH
-
-  # AIX 3 has no versioning support, so we append a major version to the name.
-  soname_spec='${libname}${release}${shared_ext}$major'
-  ;;
-
-aix[4-9]*)
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  hardcode_into_libs=yes
-  if test "$host_cpu" = ia64; then
-    # AIX 5 supports IA64
-    library_names_spec='${libname}${release}${shared_ext}$major ${libname}${release}${shared_ext}$versuffix $libname${shared_ext}'
-    shlibpath_var=LD_LIBRARY_PATH
-  else
-    # With GCC up to 2.95.x, collect2 would create an import file
-    # for dependence libraries.  The import file would start with
-    # the line `#! .'.  This would cause the generated library to
-    # depend on `.', always an invalid library.  This was fixed in
-    # development snapshots of GCC prior to 3.0.
-    case $host_os in
-      aix4 | aix4.[01] | aix4.[01].*)
-      if { echo '#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 97)'
-	   echo ' yes '
-	   echo '#endif'; } | ${CC} -E - | grep yes > /dev/null; then
-	:
-      else
-	can_build_shared=no
-      fi
-      ;;
-    esac
-    # AIX (on Power*) has no versioning support, so currently we can not hardcode correct
-    # soname into executable. Probably we can add versioning support to
-    # collect2, so additional links can be useful in future.
-    if test "$aix_use_runtimelinking" = yes; then
-      # If using run time linking (on AIX 4.2 or later) use lib<name>.so
-      # instead of lib<name>.a to let people know that these are not
-      # typical AIX shared libraries.
-      library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-    else
-      # We preserve .a as extension for shared libraries through AIX4.2
-      # and later when we are not doing run time linking.
-      library_names_spec='${libname}${release}.a $libname.a'
-      soname_spec='${libname}${release}${shared_ext}$major'
-    fi
-    shlibpath_var=LIBPATH
-  fi
-  ;;
-
-amigaos*)
-  library_names_spec='$libname.ixlibrary $libname.a'
-  # Create ${libname}_ixlibrary.a entries in /sys/libs.
-  finish_eval='for lib in `ls $libdir/*.ixlibrary 2>/dev/null`; do libname=`$echo "X$lib" | $Xsed -e '\''s%^.*/\([^/]*\)\.ixlibrary$%\1%'\''`; test $rm /sys/libs/${libname}_ixlibrary.a; $show "(cd /sys/libs && $LN_S $lib ${libname}_ixlibrary.a)"; (cd /sys/libs && $LN_S $lib ${libname}_ixlibrary.a) || exit 1; done'
-  ;;
-
-beos*)
-  library_names_spec='${libname}${shared_ext}'
-  dynamic_linker="$host_os ld.so"
-  shlibpath_var=LIBRARY_PATH
-  ;;
-
-bsdi4*)
-  version_type=linux
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  finish_cmds='PATH="\$PATH:/sbin" ldconfig $libdir'
-  shlibpath_var=LD_LIBRARY_PATH
-  sys_lib_search_path_spec="/shlib /usr/lib /usr/X11/lib /usr/contrib/lib /lib /usr/local/lib"
-  sys_lib_dlsearch_path_spec="/shlib /usr/lib /usr/local/lib"
-  # the default ld.so.conf also contains /usr/contrib/lib and
-  # /usr/X11R6/lib (/usr/X11 is a link to /usr/X11R6), but let us allow
-  # libtool to hard-code these into programs
-  ;;
-
-cygwin* | mingw* | pw32*)
-  version_type=windows
-  shrext=".dll"
-  need_version=no
-  need_lib_prefix=no
-
-  case $GCC,$host_os in
-  yes,cygwin* | yes,mingw* | yes,pw32*)
-    library_names_spec='$libname.dll.a'
-    # DLL is installed to $(libdir)/../bin by postinstall_cmds
-    postinstall_cmds='base_file=`basename \${file}`~
-      dlpath=`$SHELL 2>&1 -c '\''. $dir/'\''\${base_file}'\''i;echo \$dlname'\''`~
-      dldir=$destdir/`dirname \$dlpath`~
-      test -d \$dldir || mkdir -p \$dldir~
-      $install_prog $dir/$dlname \$dldir/$dlname'
-    postuninstall_cmds='dldll=`$SHELL 2>&1 -c '\''. $file; echo \$dlname'\''`~
-      dlpath=$dir/\$dldll~
-       $rm \$dlpath'
-    shlibpath_overrides_runpath=yes
-
-    case $host_os in
-    cygwin*)
-      # Cygwin DLLs use 'cyg' prefix rather than 'lib'
-      soname_spec='`echo ${libname} | sed -e 's/^lib/cyg/'``echo ${release} | sed -e 's/[.]/-/g'`${versuffix}${shared_ext}'
-      sys_lib_search_path_spec="/lib /lib/w32api /usr/lib /usr/local/lib"
-      ;;
-    mingw*)
-      # MinGW DLLs use traditional 'lib' prefix
-      soname_spec='${libname}`echo ${release} | sed -e 's/[.]/-/g'`${versuffix}${shared_ext}'
-      sys_lib_search_path_spec=`$CC -print-search-dirs | grep "^libraries:" | sed -e "s/^libraries://" -e "s,=/,/,g"`
-      if echo "$sys_lib_search_path_spec" | grep ';[c-zC-Z]:/' >/dev/null; then
-        # It is most probably a Windows format PATH printed by
-        # mingw gcc, but we are running on Cygwin. Gcc prints its search
-        # path with ; separators, and with drive letters. We can handle the
-        # drive letters (cygwin fileutils understands them), so leave them,
-        # especially as we might pass files found there to a mingw objdump,
-        # which wouldn't understand a cygwinified path. Ahh.
-        sys_lib_search_path_spec=`echo "$sys_lib_search_path_spec" | sed -e 's/;/ /g'`
-      else
-        sys_lib_search_path_spec=`echo "$sys_lib_search_path_spec" | sed -e "s/$PATH_SEPARATOR/ /g"`
-      fi
-      ;;
-    pw32*)
-      # pw32 DLLs use 'pw' prefix rather than 'lib'
-      library_names_spec='`echo ${libname} | sed -e 's/^lib/pw/'``echo ${release} | sed -e 's/./-/g'`${versuffix}${shared_ext}'
-      ;;
-    esac
-    ;;
-
-  *)
-    library_names_spec='${libname}`echo ${release} | sed -e 's/[.]/-/g'`${versuffix}${shared_ext} $libname.lib'
-    ;;
-  esac
-  dynamic_linker='Win32 ld.exe'
-  # FIXME: first we should search . and the directory the executable is in
-  shlibpath_var=PATH
-  ;;
-
-darwin* | rhapsody*)
-  dynamic_linker="$host_os dyld"
-  version_type=darwin
-  need_lib_prefix=no
-  need_version=no
-  # FIXME: Relying on posixy $() will cause problems for
-  #        cross-compilation, but unfortunately the echo tests do not
-  #        yet detect zsh echo's removal of \ escapes.
-  library_names_spec='${libname}${release}${versuffix}$shared_ext ${libname}${release}${major}$shared_ext ${libname}$shared_ext'
-  soname_spec='${libname}${release}${major}$shared_ext'
-  shlibpath_overrides_runpath=yes
-  shlibpath_var=DYLD_LIBRARY_PATH
-  shrext='$(test .$module = .yes && echo .so || echo .dylib)'
-  # Apple's gcc prints 'gcc -print-search-dirs' doesn't operate the same.
-  if $CC -v 2>&1 | grep 'Apple' >/dev/null ; then
-  sys_lib_search_path_spec=`$CC -print-search-dirs | tr "\n" "$PATH_SEPARATOR" | sed -e 's/libraries:/@libraries:/' | tr "@" "\n" | grep "^libraries:" | sed -e "s/^libraries://" -e "s,=/,/,g" -e "s,$PATH_SEPARATOR, ,g" -e "s,.*,& /lib /usr/lib /usr/local/lib,g"`
-  fi
-  sys_lib_dlsearch_path_spec='/usr/local/lib /lib /usr/lib'
-  ;;
-
-dgux*)
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname$shared_ext'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  ;;
-
-freebsd*)
-  objformat=`test -x /usr/bin/objformat && /usr/bin/objformat || echo aout`
-  version_type=freebsd-$objformat
-  case $version_type in
-    freebsd-elf*)
-      library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext} $libname${shared_ext}'
-      need_version=no
-      need_lib_prefix=no
-      ;;
-    freebsd-*)
-      library_names_spec='${libname}${release}${shared_ext}$versuffix $libname${shared_ext}$versuffix'
-      need_version=yes
-      ;;
-  esac
-  shlibpath_var=LD_LIBRARY_PATH
-  case $host_os in
-  freebsd2*)
-    shlibpath_overrides_runpath=yes
-    ;;
-  freebsd3.01* | freebsdelf3.01*)
-    shlibpath_overrides_runpath=yes
-    hardcode_into_libs=yes
-    ;;
-  *) # from 3.2 on
-    shlibpath_overrides_runpath=no
-    hardcode_into_libs=yes
-    ;;
-  esac
-  ;;
-
-gnu*)
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}${major} ${libname}${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  hardcode_into_libs=yes
-  ;;
-
-hpux9* | hpux10* | hpux11*)
-  # Give a soname corresponding to the major version so that dld.sl refuses to
-  # link against other versions.
-  version_type=sunos
-  need_lib_prefix=no
-  need_version=no
-  case "$host_cpu" in
-  ia64*)
-    shrext='.so'
-    hardcode_into_libs=yes
-    dynamic_linker="$host_os dld.so"
-    shlibpath_var=LD_LIBRARY_PATH
-    shlibpath_overrides_runpath=yes # Unless +noenvvar is specified.
-    library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-    soname_spec='${libname}${release}${shared_ext}$major'
-    if test "X$HPUX_IA64_MODE" = X32; then
-      sys_lib_search_path_spec="/usr/lib/hpux32 /usr/local/lib/hpux32 /usr/local/lib"
-    else
-      sys_lib_search_path_spec="/usr/lib/hpux64 /usr/local/lib/hpux64"
-    fi
-    sys_lib_dlsearch_path_spec=$sys_lib_search_path_spec
-    ;;
-   hppa*64*)
-     shrext='.sl'
-     hardcode_into_libs=yes
-     dynamic_linker="$host_os dld.sl"
-     shlibpath_var=LD_LIBRARY_PATH # How should we handle SHLIB_PATH
-     shlibpath_overrides_runpath=yes # Unless +noenvvar is specified.
-     library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-     soname_spec='${libname}${release}${shared_ext}$major'
-     sys_lib_search_path_spec="/usr/lib/pa20_64 /usr/ccs/lib/pa20_64"
-     sys_lib_dlsearch_path_spec=$sys_lib_search_path_spec
-     ;;
-   *)
-    shrext='.sl'
-    dynamic_linker="$host_os dld.sl"
-    shlibpath_var=SHLIB_PATH
-    shlibpath_overrides_runpath=no # +s is required to enable SHLIB_PATH
-    library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-    soname_spec='${libname}${release}${shared_ext}$major'
-    ;;
-  esac
-  # HP-UX runs *really* slowly unless shared libraries are mode 555.
-  postinstall_cmds='chmod 555 $lib'
-  ;;
-
-irix5* | irix6* | nonstopux*)
-  case $host_os in
-    nonstopux*) version_type=nonstopux ;;
-    *)
-	if test "$lt_cv_prog_gnu_ld" = yes; then
-		version_type=linux
-	else
-		version_type=irix
-	fi ;;
-  esac
-  need_lib_prefix=no
-  need_version=no
-  soname_spec='${libname}${release}${shared_ext}$major'
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${release}${shared_ext} $libname${shared_ext}'
-  case $host_os in
-  irix5* | nonstopux*)
-    libsuff= shlibsuff=
-    ;;
-  *)
-    case $LD in # libtool.m4 will add one of these switches to LD
-    *-32|*"-32 "|*-melf32bsmip|*"-melf32bsmip ")
-      libsuff= shlibsuff= libmagic=32-bit;;
-    *-n32|*"-n32 "|*-melf32bmipn32|*"-melf32bmipn32 ")
-      libsuff=32 shlibsuff=N32 libmagic=N32;;
-    *-64|*"-64 "|*-melf64bmip|*"-melf64bmip ")
-      libsuff=64 shlibsuff=64 libmagic=64-bit;;
-    *) libsuff= shlibsuff= libmagic=never-match;;
-    esac
-    ;;
-  esac
-  shlibpath_var=LD_LIBRARY${shlibsuff}_PATH
-  shlibpath_overrides_runpath=no
-  sys_lib_search_path_spec="/usr/lib${libsuff} /lib${libsuff} /usr/local/lib${libsuff}"
-  sys_lib_dlsearch_path_spec="/usr/lib${libsuff} /lib${libsuff}"
-  hardcode_into_libs=yes
-  ;;
-
-# No shared lib support for Linux oldld, aout, or coff.
-linux*oldld* | linux*aout* | linux*coff*)
-  dynamic_linker=no
-  ;;
-
-# This must be Linux ELF.
-linux*|k*bsd*-gnu)
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  finish_cmds='PATH="\$PATH:/sbin" ldconfig -n $libdir'
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=no
-  # This implies no fast_install, which is unacceptable.
-  # Some rework will be needed to allow for fast_install
-  # before this can be enabled.
-  hardcode_into_libs=yes
-
-  # We used to test for /lib/ld.so.1 and disable shared libraries on
-  # powerpc, because MkLinux only supported shared libraries with the
-  # GNU dynamic linker.  Since this was broken with cross compilers,
-  # most powerpc-linux boxes support dynamic linking these days and
-  # people can always --disable-shared, the test was removed, and we
-  # assume the GNU/Linux dynamic linker is in use.
-  dynamic_linker='GNU/Linux ld.so'
-  ;;
-
-netbsd*)
-  version_type=sunos
-  need_lib_prefix=no
-  need_version=no
-  if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
-    library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${shared_ext}$versuffix'
-    finish_cmds='PATH="\$PATH:/sbin" ldconfig -m $libdir'
-    dynamic_linker='NetBSD (a.out) ld.so'
-  else
-    library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${release}${shared_ext} ${libname}${shared_ext}'
-    soname_spec='${libname}${release}${shared_ext}$major'
-    dynamic_linker='NetBSD ld.elf_so'
-  fi
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=yes
-  hardcode_into_libs=yes
-  ;;
-
-newsos6)
-  version_type=linux
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=yes
-  ;;
-
-nto-qnx)
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=yes
-  ;;
-
-openbsd*)
-  version_type=sunos
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${shared_ext}$versuffix'
-  finish_cmds='PATH="\$PATH:/sbin" ldconfig -m $libdir'
-  shlibpath_var=LD_LIBRARY_PATH
-  if test -z "`echo __ELF__ | $CC -E - | grep __ELF__`" || test "$host_os-$host_cpu" = "openbsd2.8-powerpc"; then
-    case $host_os in
-      openbsd2.[89] | openbsd2.[89].*)
-	shlibpath_overrides_runpath=no
-	;;
-      *)
-	shlibpath_overrides_runpath=yes
-	;;
-      esac
-  else
-    shlibpath_overrides_runpath=yes
-  fi
-  ;;
-
-os2*)
-  libname_spec='$name'
-  shrext=".dll"
-  need_lib_prefix=no
-  library_names_spec='$libname${shared_ext} $libname.a'
-  dynamic_linker='OS/2 ld.exe'
-  shlibpath_var=LIBPATH
-  ;;
-
-osf3* | osf4* | osf5*)
-  version_type=osf
-  need_lib_prefix=no
-  need_version=no
-  soname_spec='${libname}${release}${shared_ext}$major'
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-  shlibpath_var=LD_LIBRARY_PATH
-  sys_lib_search_path_spec="/usr/shlib /usr/ccs/lib /usr/lib/cmplrs/cc /usr/lib /usr/local/lib /var/shlib"
-  sys_lib_dlsearch_path_spec="$sys_lib_search_path_spec"
-  ;;
-
-sco3.2v5*)
-  version_type=osf
-  soname_spec='${libname}${release}${shared_ext}$major'
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-  shlibpath_var=LD_LIBRARY_PATH
-  ;;
-
-solaris*)
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=yes
-  hardcode_into_libs=yes
-  # ldd complains unless libraries are executable
-  postinstall_cmds='chmod +x $lib'
-  ;;
-
-sunos4*)
-  version_type=sunos
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${shared_ext}$versuffix'
-  finish_cmds='PATH="\$PATH:/usr/etc" ldconfig $libdir'
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=yes
-  if test "$with_gnu_ld" = yes; then
-    need_lib_prefix=no
-  fi
-  need_version=yes
-  ;;
-
-sysv4 | sysv4.2uw2* | sysv4.3* | sysv5*)
-  version_type=linux
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  case $host_vendor in
-    sni)
-      shlibpath_overrides_runpath=no
-      need_lib_prefix=no
-      export_dynamic_flag_spec='${wl}-Blargedynsym'
-      runpath_var=LD_RUN_PATH
-      ;;
-    siemens)
-      need_lib_prefix=no
-      ;;
-    motorola)
-      need_lib_prefix=no
-      need_version=no
-      shlibpath_overrides_runpath=no
-      sys_lib_search_path_spec='/lib /usr/lib /usr/ccs/lib'
-      ;;
-  esac
-  ;;
-
-sysv4*MP*)
-  if test -d /usr/nec ;then
-    version_type=linux
-    library_names_spec='$libname${shared_ext}.$versuffix $libname${shared_ext}.$major $libname${shared_ext}'
-    soname_spec='$libname${shared_ext}.$major'
-    shlibpath_var=LD_LIBRARY_PATH
-  fi
-  ;;
-
-uts4*)
-  version_type=linux
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  ;;
-
-*)
-  dynamic_linker=no
-  ;;
-esac
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $dynamic_linker" >&5
-$as_echo "$dynamic_linker" >&6; }
-test "$dynamic_linker" = no && can_build_shared=no
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking which variable specifies run-time library path" >&5
-$as_echo_n "checking which variable specifies run-time library path... " >&6; }
-if ${libltdl_cv_shlibpath_var+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  libltdl_cv_shlibpath_var="$shlibpath_var"
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $libltdl_cv_shlibpath_var" >&5
-$as_echo "$libltdl_cv_shlibpath_var" >&6; }
-if test -n "$libltdl_cv_shlibpath_var"; then
-
-cat >>confdefs.h <<_ACEOF
-#define LTDL_SHLIBPATH_VAR "$libltdl_cv_shlibpath_var"
-_ACEOF
-
-fi
-
-fi
-
 ac_config_headers="$ac_config_headers include/config.h gcj/libgcj-config.h"
 
 
@@ -7070,8 +6569,6 @@ test -f libgcj.spec || touch libgcj.spec
 
 # Set up to configure Classpath.
 # FIXME: no supported way to pass args in autoconf.
-# Disable tool wrappers to avoid ltdl.h configure check.
-ac_configure_args="$ac_configure_args --disable-tool-wrappers"
 ac_configure_args="$ac_configure_args --disable-load-library"
 ac_configure_args="$ac_configure_args --${LIBGCJDEBUG}-debug"
 ac_configure_args="$ac_configure_args --enable-default-toolkit=$TOOLKIT"
@@ -7115,35 +6612,6 @@ fi
 # -Werror causes unavoidable problems in code using alsa.
 ac_configure_args="$ac_configure_args --disable-regen-headers"
 ac_configure_args="$ac_configure_args --disable-Werror"
-
-# Only use libltdl for non-newlib builds.
-if test "x${with_newlib}" = "x" || test "x${with_newlib}" = "xno"; then
-     case $enable_ltdl_convenience in
-  no) as_fn_error $? "this package needs a convenience libltdl" "$LINENO" 5 ;;
-  "") enable_ltdl_convenience=yes
-      ac_configure_args="$ac_configure_args --enable-ltdl-convenience" ;;
-  esac
-  LIBLTDL='${top_builddir}/''libltdl'/libltdlc.la
-  LTDLINCL='-I${top_srcdir}/''libltdl'
-  # For backwards non-gettext consistent compatibility...
-  INCLTDL="$LTDLINCL"
-
-   enable_dlopen=yes
-
-
-
-   DIRLTDL=libltdl
-
-$as_echo "#define USE_LTDL 1" >>confdefs.h
-
-   # Sigh.  Libtool's macro doesn't do the right thing.
-   INCLTDL="-I\$(top_srcdir)/libltdl $INCLTDL"
-   # FIXME: this is a hack.
-   sub_auxdir="`cd $ac_aux_dir && ${PWDCMD-pwd}`"
-   ac_configure_args="$ac_configure_args --with-auxdir=$sub_auxdir"
-fi
-
-
 
 case `pwd` in
   *\ * | *\	*)
@@ -10147,6 +9615,7 @@ done
 
 
 # Set options
+enable_dlopen=yes
 
 
 
@@ -13659,7 +13128,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 13662 "configure"
+#line 13131 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13765,7 +13234,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 13768 "configure"
+#line 13237 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -17042,6 +16511,1192 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 # Only expand once:
 
 
+for ac_header in ltdl.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "ltdl.h" "ac_cv_header_ltdl_h" "$ac_includes_default"
+if test "x$ac_cv_header_ltdl_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LTDL_H 1
+_ACEOF
+
+fi
+
+done
+
+if test "$ac_cv_header_ltdl_h" = "no"; then
+  as_fn_error $? "cannot find ltdl.h" "$LINENO" 5
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking what extension is used for runtime loadable modules" >&5
+$as_echo_n "checking what extension is used for runtime loadable modules... " >&6; }
+if ${libltdl_cv_shlibext+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+module=yes
+eval libltdl_cv_shlibext=$shrext_cmds
+module=no
+eval libltdl_cv_shrext=$shrext_cmds
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $libltdl_cv_shlibext" >&5
+$as_echo "$libltdl_cv_shlibext" >&6; }
+if test -n "$libltdl_cv_shlibext"; then
+
+cat >>confdefs.h <<_ACEOF
+#define LT_MODULE_EXT "$libltdl_cv_shlibext"
+_ACEOF
+
+fi
+if test "$libltdl_cv_shrext" != "$libltdl_cv_shlibext"; then
+
+cat >>confdefs.h <<_ACEOF
+#define LT_SHARED_EXT "$libltdl_cv_shrext"
+_ACEOF
+
+fi
+if test -n "$shared_archive_member_spec"; then
+
+cat >>confdefs.h <<_ACEOF
+#define LT_SHARED_LIB_MEMBER "($shared_archive_member_spec.o)"
+_ACEOF
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking what variable specifies run-time module search path" >&5
+$as_echo_n "checking what variable specifies run-time module search path... " >&6; }
+if ${lt_cv_module_path_var+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  lt_cv_module_path_var=$shlibpath_var
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_module_path_var" >&5
+$as_echo "$lt_cv_module_path_var" >&6; }
+if test -n "$lt_cv_module_path_var"; then
+
+cat >>confdefs.h <<_ACEOF
+#define LT_MODULE_PATH_VAR "$lt_cv_module_path_var"
+_ACEOF
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for the default library search path" >&5
+$as_echo_n "checking for the default library search path... " >&6; }
+if ${lt_cv_sys_dlsearch_path+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  lt_cv_sys_dlsearch_path=$sys_lib_dlsearch_path_spec
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_sys_dlsearch_path" >&5
+$as_echo "$lt_cv_sys_dlsearch_path" >&6; }
+if test -n "$lt_cv_sys_dlsearch_path"; then
+  sys_dlsearch_path=
+  for dir in $lt_cv_sys_dlsearch_path; do
+    if test -z "$sys_dlsearch_path"; then
+      sys_dlsearch_path=$dir
+    else
+      sys_dlsearch_path=$sys_dlsearch_path$PATH_SEPARATOR$dir
+    fi
+  done
+
+cat >>confdefs.h <<_ACEOF
+#define LT_DLSEARCH_PATH "$sys_dlsearch_path"
+_ACEOF
+
+fi
+
+
+LT_DLLOADERS=
+
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+lt_dlload_save_LIBS=$LIBS
+
+LIBADD_DLOPEN=
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing dlopen" >&5
+$as_echo_n "checking for library containing dlopen... " >&6; }
+if ${ac_cv_search_dlopen+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dlopen ();
+int
+main ()
+{
+return dlopen ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' dl; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if test x$gcc_no_link = xyes; then
+  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
+fi
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_dlopen=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_dlopen+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_dlopen+:} false; then :
+
+else
+  ac_cv_search_dlopen=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_dlopen" >&5
+$as_echo "$ac_cv_search_dlopen" >&6; }
+ac_res=$ac_cv_search_dlopen
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+$as_echo "#define HAVE_LIBDL 1" >>confdefs.h
+
+	if test "$ac_cv_search_dlopen" != "none required"; then
+	  LIBADD_DLOPEN=-ldl
+	fi
+	libltdl_cv_lib_dl_dlopen=yes
+	LT_DLLOADERS="$LT_DLLOADERS ${lt_dlopen_dir+$lt_dlopen_dir/}dlopen.la"
+else
+  if test x$gcc_no_link = xyes; then
+  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
+fi
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#if HAVE_DLFCN_H
+#  include <dlfcn.h>
+#endif
+
+int
+main ()
+{
+dlopen(0, 0);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+$as_echo "#define HAVE_LIBDL 1" >>confdefs.h
+
+	    libltdl_cv_func_dlopen=yes
+	    LT_DLLOADERS="$LT_DLLOADERS ${lt_dlopen_dir+$lt_dlopen_dir/}dlopen.la"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for dlopen in -lsvld" >&5
+$as_echo_n "checking for dlopen in -lsvld... " >&6; }
+if ${ac_cv_lib_svld_dlopen+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lsvld  $LIBS"
+if test x$gcc_no_link = xyes; then
+  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
+fi
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dlopen ();
+int
+main ()
+{
+return dlopen ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_svld_dlopen=yes
+else
+  ac_cv_lib_svld_dlopen=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_svld_dlopen" >&5
+$as_echo "$ac_cv_lib_svld_dlopen" >&6; }
+if test "x$ac_cv_lib_svld_dlopen" = xyes; then :
+
+$as_echo "#define HAVE_LIBDL 1" >>confdefs.h
+
+	        LIBADD_DLOPEN=-lsvld libltdl_cv_func_dlopen=yes
+		LT_DLLOADERS="$LT_DLLOADERS ${lt_dlopen_dir+$lt_dlopen_dir/}dlopen.la"
+fi
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+
+if test yes = "$libltdl_cv_func_dlopen" || test yes = "$libltdl_cv_lib_dl_dlopen"
+then
+  lt_save_LIBS=$LIBS
+  LIBS="$LIBS $LIBADD_DLOPEN"
+  for ac_func in dlerror
+do :
+  ac_fn_c_check_func "$LINENO" "dlerror" "ac_cv_func_dlerror"
+if test "x$ac_cv_func_dlerror" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_DLERROR 1
+_ACEOF
+
+fi
+done
+
+  LIBS=$lt_save_LIBS
+fi
+
+
+LIBADD_SHL_LOAD=
+ac_fn_c_check_func "$LINENO" "shl_load" "ac_cv_func_shl_load"
+if test "x$ac_cv_func_shl_load" = xyes; then :
+
+$as_echo "#define HAVE_SHL_LOAD 1" >>confdefs.h
+
+	LT_DLLOADERS="$LT_DLLOADERS ${lt_dlopen_dir+$lt_dlopen_dir/}shl_load.la"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for shl_load in -ldld" >&5
+$as_echo_n "checking for shl_load in -ldld... " >&6; }
+if ${ac_cv_lib_dld_shl_load+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ldld  $LIBS"
+if test x$gcc_no_link = xyes; then
+  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
+fi
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char shl_load ();
+int
+main ()
+{
+return shl_load ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_dld_shl_load=yes
+else
+  ac_cv_lib_dld_shl_load=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_dld_shl_load" >&5
+$as_echo "$ac_cv_lib_dld_shl_load" >&6; }
+if test "x$ac_cv_lib_dld_shl_load" = xyes; then :
+
+$as_echo "#define HAVE_SHL_LOAD 1" >>confdefs.h
+
+	    LT_DLLOADERS="$LT_DLLOADERS ${lt_dlopen_dir+$lt_dlopen_dir/}shl_load.la"
+	    LIBADD_SHL_LOAD=-ldld
+fi
+
+fi
+
+
+
+case $host_os in
+darwin[1567].*)
+# We only want this for pre-Mac OS X 10.4.
+  ac_fn_c_check_func "$LINENO" "_dyld_func_lookup" "ac_cv_func__dyld_func_lookup"
+if test "x$ac_cv_func__dyld_func_lookup" = xyes; then :
+
+$as_echo "#define HAVE_DYLD 1" >>confdefs.h
+
+	LT_DLLOADERS="$LT_DLLOADERS ${lt_dlopen_dir+$lt_dlopen_dir/}dyld.la"
+fi
+
+  ;;
+beos*)
+  LT_DLLOADERS="$LT_DLLOADERS ${lt_dlopen_dir+$lt_dlopen_dir/}load_add_on.la"
+  ;;
+cygwin* | mingw* | pw32*)
+  ac_fn_c_check_decl "$LINENO" "cygwin_conv_path" "ac_cv_have_decl_cygwin_conv_path" "#include <sys/cygwin.h>
+"
+if test "x$ac_cv_have_decl_cygwin_conv_path" = xyes; then :
+  ac_have_decl=1
+else
+  ac_have_decl=0
+fi
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_DECL_CYGWIN_CONV_PATH $ac_have_decl
+_ACEOF
+
+  LT_DLLOADERS="$LT_DLLOADERS ${lt_dlopen_dir+$lt_dlopen_dir/}loadlibrary.la"
+  ;;
+esac
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for dld_link in -ldld" >&5
+$as_echo_n "checking for dld_link in -ldld... " >&6; }
+if ${ac_cv_lib_dld_dld_link+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ldld  $LIBS"
+if test x$gcc_no_link = xyes; then
+  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
+fi
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char dld_link ();
+int
+main ()
+{
+return dld_link ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_dld_dld_link=yes
+else
+  ac_cv_lib_dld_dld_link=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_dld_dld_link" >&5
+$as_echo "$ac_cv_lib_dld_dld_link" >&6; }
+if test "x$ac_cv_lib_dld_dld_link" = xyes; then :
+
+$as_echo "#define HAVE_DLD 1" >>confdefs.h
+
+		LT_DLLOADERS="$LT_DLLOADERS ${lt_dlopen_dir+$lt_dlopen_dir/}dld_link.la"
+fi
+
+
+
+
+LT_DLPREOPEN=
+if test -n "$LT_DLLOADERS"
+then
+  for lt_loader in $LT_DLLOADERS; do
+    LT_DLPREOPEN="$LT_DLPREOPEN-dlpreopen $lt_loader "
+  done
+
+$as_echo "#define HAVE_LIBDLLOADER 1" >>confdefs.h
+
+fi
+
+
+LIBADD_DL="$LIBADD_DLOPEN $LIBADD_SHL_LOAD"
+
+
+LIBS=$lt_dlload_save_LIBS
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for _ prefix in compiled symbols" >&5
+$as_echo_n "checking for _ prefix in compiled symbols... " >&6; }
+if ${lt_cv_sys_symbol_underscore+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  lt_cv_sys_symbol_underscore=no
+  cat > conftest.$ac_ext <<_LT_EOF
+void nm_test_func(){}
+int main(){nm_test_func;return 0;}
+_LT_EOF
+  if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+    # Now try to grab the symbols.
+    ac_nlist=conftest.nm
+    if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$NM conftest.$ac_objext \| $lt_cv_sys_global_symbol_pipe \> $ac_nlist\""; } >&5
+  (eval $NM conftest.$ac_objext \| $lt_cv_sys_global_symbol_pipe \> $ac_nlist) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } && test -s "$ac_nlist"; then
+      # See whether the symbols have a leading underscore.
+      if grep '^. _nm_test_func' "$ac_nlist" >/dev/null; then
+        lt_cv_sys_symbol_underscore=yes
+      else
+        if grep '^. nm_test_func ' "$ac_nlist" >/dev/null; then
+	  :
+        else
+	  echo "configure: cannot find nm_test_func in $ac_nlist" >&5
+        fi
+      fi
+    else
+      echo "configure: cannot run $lt_cv_sys_global_symbol_pipe" >&5
+    fi
+  else
+    echo "configure: failed program was:" >&5
+    cat conftest.c >&5
+  fi
+  rm -rf conftest*
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_sys_symbol_underscore" >&5
+$as_echo "$lt_cv_sys_symbol_underscore" >&6; }
+  sys_symbol_underscore=$lt_cv_sys_symbol_underscore
+
+
+if test yes = "$lt_cv_sys_symbol_underscore"; then
+  if test yes = "$libltdl_cv_func_dlopen" || test yes = "$libltdl_cv_lib_dl_dlopen"; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we have to add an underscore for dlsym" >&5
+$as_echo_n "checking whether we have to add an underscore for dlsym... " >&6; }
+if ${libltdl_cv_need_uscore+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  libltdl_cv_need_uscore=unknown
+      dlsym_uscore_save_LIBS=$LIBS
+      LIBS="$LIBS $LIBADD_DLOPEN"
+      libname=conftmod # stay within 8.3 filename limits!
+      cat >$libname.$ac_ext <<_LT_EOF
+#line $LINENO "configure"
+#include "confdefs.h"
+/* When -fvisibility=hidden is used, assume the code has been annotated
+   correspondingly for the symbols needed.  */
+#if defined __GNUC__ && (((__GNUC__ == 3) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 3))
+int fnord () __attribute__((visibility("default")));
+#endif
+int fnord () { return 42; }
+_LT_EOF
+
+      # ltfn_module_cmds module_cmds
+      # Execute tilde-delimited MODULE_CMDS with environment primed for
+      # $module_cmds or $archive_cmds type content.
+      ltfn_module_cmds ()
+      {( # subshell avoids polluting parent global environment
+          module_cmds_save_ifs=$IFS; IFS='~'
+          for cmd in $1; do
+            IFS=$module_cmds_save_ifs
+            libobjs=$libname.$ac_objext; lib=$libname$libltdl_cv_shlibext
+            rpath=/not-exists; soname=$libname$libltdl_cv_shlibext; output_objdir=.
+            major=; versuffix=; verstring=; deplibs=
+            ECHO=echo; wl=$lt_prog_compiler_wl; allow_undefined_flag=
+            eval $cmd
+          done
+          IFS=$module_cmds_save_ifs
+      )}
+
+      # Compile a loadable module using libtool macro expansion results.
+      $CC $pic_flag -c $libname.$ac_ext
+      ltfn_module_cmds "${module_cmds:-$archive_cmds}"
+
+      # Try to fetch fnord with dlsym().
+      libltdl_dlunknown=0; libltdl_dlnouscore=1; libltdl_dluscore=2
+      cat >conftest.$ac_ext <<_LT_EOF
+#line $LINENO "configure"
+#include "confdefs.h"
+#if HAVE_DLFCN_H
+#include <dlfcn.h>
+#endif
+#include <stdio.h>
+#ifndef RTLD_GLOBAL
+#  ifdef DL_GLOBAL
+#    define RTLD_GLOBAL DL_GLOBAL
+#  else
+#    define RTLD_GLOBAL 0
+#  endif
+#endif
+#ifndef RTLD_NOW
+#  ifdef DL_NOW
+#    define RTLD_NOW DL_NOW
+#  else
+#    define RTLD_NOW 0
+#  endif
+#endif
+int main () {
+  void *handle = dlopen ("`pwd`/$libname$libltdl_cv_shlibext", RTLD_GLOBAL|RTLD_NOW);
+  int status = $libltdl_dlunknown;
+  if (handle) {
+    if (dlsym (handle, "fnord"))
+      status = $libltdl_dlnouscore;
+    else {
+      if (dlsym (handle, "_fnord"))
+        status = $libltdl_dluscore;
+      else
+	puts (dlerror ());
+    }
+    dlclose (handle);
+  } else
+    puts (dlerror ());
+  return status;
+}
+_LT_EOF
+      if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_link\""; } >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } && test -s "conftest$ac_exeext" 2>/dev/null; then
+        (./conftest; exit; ) >&5 2>/dev/null
+        libltdl_status=$?
+        case x$libltdl_status in
+          x$libltdl_dlnouscore) libltdl_cv_need_uscore=no ;;
+	  x$libltdl_dluscore) libltdl_cv_need_uscore=yes ;;
+	  x*) libltdl_cv_need_uscore=unknown ;;
+        esac
+      fi
+      rm -rf conftest* $libname*
+      LIBS=$dlsym_uscore_save_LIBS
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $libltdl_cv_need_uscore" >&5
+$as_echo "$libltdl_cv_need_uscore" >&6; }
+  fi
+fi
+
+if test yes = "$libltdl_cv_need_uscore"; then
+
+$as_echo "#define NEED_USCORE 1" >>confdefs.h
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether deplibs are loaded by dlopen" >&5
+$as_echo_n "checking whether deplibs are loaded by dlopen... " >&6; }
+if ${lt_cv_sys_dlopen_deplibs+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  # PORTME does your system automatically load deplibs for dlopen?
+  # or its logical equivalent (e.g. shl_load for HP-UX < 11)
+  # For now, we just catch OSes we know something about -- in the
+  # future, we'll try test this programmatically.
+  lt_cv_sys_dlopen_deplibs=unknown
+  case $host_os in
+  aix3*|aix4.1.*|aix4.2.*)
+    # Unknown whether this is true for these versions of AIX, but
+    # we want this 'case' here to explicitly catch those versions.
+    lt_cv_sys_dlopen_deplibs=unknown
+    ;;
+  aix[4-9]*)
+    lt_cv_sys_dlopen_deplibs=yes
+    ;;
+  amigaos*)
+    case $host_cpu in
+    powerpc)
+      lt_cv_sys_dlopen_deplibs=no
+      ;;
+    esac
+    ;;
+  bitrig*)
+    lt_cv_sys_dlopen_deplibs=yes
+    ;;
+  darwin*)
+    # Assuming the user has installed a libdl from somewhere, this is true
+    # If you are looking for one http://www.opendarwin.org/projects/dlcompat
+    lt_cv_sys_dlopen_deplibs=yes
+    ;;
+  freebsd* | dragonfly* | midnightbsd*)
+    lt_cv_sys_dlopen_deplibs=yes
+    ;;
+  gnu* | linux* | k*bsd*-gnu | kopensolaris*-gnu)
+    # GNU and its variants, using gnu ld.so (Glibc)
+    lt_cv_sys_dlopen_deplibs=yes
+    ;;
+  hpux10*|hpux11*)
+    lt_cv_sys_dlopen_deplibs=yes
+    ;;
+  interix*)
+    lt_cv_sys_dlopen_deplibs=yes
+    ;;
+  irix[12345]*|irix6.[01]*)
+    # Catch all versions of IRIX before 6.2, and indicate that we don't
+    # know how it worked for any of those versions.
+    lt_cv_sys_dlopen_deplibs=unknown
+    ;;
+  irix*)
+    # The case above catches anything before 6.2, and it's known that
+    # at 6.2 and later dlopen does load deplibs.
+    lt_cv_sys_dlopen_deplibs=yes
+    ;;
+  netbsd* | netbsdelf*-gnu)
+    lt_cv_sys_dlopen_deplibs=yes
+    ;;
+  openbsd*)
+    lt_cv_sys_dlopen_deplibs=yes
+    ;;
+  osf[1234]*)
+    # dlopen did load deplibs (at least at 4.x), but until the 5.x series,
+    # it did *not* use an RPATH in a shared library to find objects the
+    # library depends on, so we explicitly say 'no'.
+    lt_cv_sys_dlopen_deplibs=no
+    ;;
+  osf5.0|osf5.0a|osf5.1)
+    # dlopen *does* load deplibs and with the right loader patch applied
+    # it even uses RPATH in a shared library to search for shared objects
+    # that the library depends on, but there's no easy way to know if that
+    # patch is installed.  Since this is the case, all we can really
+    # say is unknown -- it depends on the patch being installed.  If
+    # it is, this changes to 'yes'.  Without it, it would be 'no'.
+    lt_cv_sys_dlopen_deplibs=unknown
+    ;;
+  osf*)
+    # the two cases above should catch all versions of osf <= 5.1.  Read
+    # the comments above for what we know about them.
+    # At > 5.1, deplibs are loaded *and* any RPATH in a shared library
+    # is used to find them so we can finally say 'yes'.
+    lt_cv_sys_dlopen_deplibs=yes
+    ;;
+  qnx*)
+    lt_cv_sys_dlopen_deplibs=yes
+    ;;
+  solaris*)
+    lt_cv_sys_dlopen_deplibs=yes
+    ;;
+  sysv5* | sco3.2v5* | sco5v6* | unixware* | OpenUNIX* | sysv4*uw2*)
+    libltdl_cv_sys_dlopen_deplibs=yes
+    ;;
+  esac
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_sys_dlopen_deplibs" >&5
+$as_echo "$lt_cv_sys_dlopen_deplibs" >&6; }
+if test yes != "$lt_cv_sys_dlopen_deplibs"; then
+
+$as_echo "#define LTDL_DLOPEN_DEPLIBS 1" >>confdefs.h
+
+fi
+
+
+for ac_header in argz.h
+do :
+  ac_fn_c_check_header_compile "$LINENO" "argz.h" "ac_cv_header_argz_h" "$ac_includes_default
+"
+if test "x$ac_cv_header_argz_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_ARGZ_H 1
+_ACEOF
+
+fi
+
+done
+
+
+ac_fn_c_check_type "$LINENO" "error_t" "ac_cv_type_error_t" "#if defined(HAVE_ARGZ_H)
+#  include <argz.h>
+#endif
+"
+if test "x$ac_cv_type_error_t" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_ERROR_T 1
+_ACEOF
+
+
+else
+
+$as_echo "#define error_t int" >>confdefs.h
+
+
+$as_echo "#define __error_t_defined 1" >>confdefs.h
+
+fi
+
+
+LT_ARGZ_H=
+for ac_func in argz_add argz_append argz_count argz_create_sep argz_insert \
+	argz_next argz_stringify
+do :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+
+else
+  LT_ARGZ_H=lt__argz.h;
+
+  _LT_LIBOBJS="$_LT_LIBOBJS lt__argz.$ac_objext"
+
+fi
+done
+
+
+if test -z "$LT_ARGZ_H"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if argz actually works" >&5
+$as_echo_n "checking if argz actually works... " >&6; }
+if ${lt_cv_sys_argz_works+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $host_os in #(
+	 *cygwin*)
+	   lt_cv_sys_argz_works=no
+	   if test no != "$cross_compiling"; then
+	     lt_cv_sys_argz_works="guessing no"
+	   else
+	     lt_sed_extract_leading_digits='s/^\([0-9\.]*\).*/\1/'
+	     save_IFS=$IFS
+	     IFS=-.
+	     set x `uname -r | $SED -e "$lt_sed_extract_leading_digits"`
+	     IFS=$save_IFS
+	     lt_os_major=${2-0}
+	     lt_os_minor=${3-0}
+	     lt_os_micro=${4-0}
+	     if test 1 -lt "$lt_os_major" \
+		|| { test 1 -eq "$lt_os_major" \
+		  && { test 5 -lt "$lt_os_minor" \
+		    || { test 5 -eq "$lt_os_minor" \
+		      && test 24 -lt "$lt_os_micro"; }; }; }; then
+	       lt_cv_sys_argz_works=yes
+	     fi
+	   fi
+	   ;; #(
+	 *) lt_cv_sys_argz_works=yes ;;
+	 esac
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_sys_argz_works" >&5
+$as_echo "$lt_cv_sys_argz_works" >&6; }
+     if test yes = "$lt_cv_sys_argz_works"; then :
+
+$as_echo "#define HAVE_WORKING_ARGZ 1" >>confdefs.h
+
+else
+  LT_ARGZ_H=lt__argz.h
+
+
+  _LT_LIBOBJS="$_LT_LIBOBJS lt__argz.$ac_objext"
+
+fi
+fi
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether libtool supports -dlopen/-dlpreopen" >&5
+$as_echo_n "checking whether libtool supports -dlopen/-dlpreopen... " >&6; }
+if ${libltdl_cv_preloaded_symbols+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$lt_cv_sys_global_symbol_pipe"; then
+    libltdl_cv_preloaded_symbols=yes
+  else
+    libltdl_cv_preloaded_symbols=no
+  fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $libltdl_cv_preloaded_symbols" >&5
+$as_echo "$libltdl_cv_preloaded_symbols" >&6; }
+if test yes = "$libltdl_cv_preloaded_symbols"; then
+
+$as_echo "#define HAVE_PRELOADED_SYMBOLS 1" >>confdefs.h
+
+fi
+
+
+
+# Set options
+
+
+
+
+
+
+
+
+
+
+
+
+# Check whether --with-included_ltdl was given.
+if test "${with_included_ltdl+set}" = set; then :
+  withval=$with_included_ltdl;
+fi
+
+
+if test yes != "$with_included_ltdl"; then
+  # We are not being forced to use the included libltdl sources, so
+  # decide whether there is a useful installed version we can use.
+  ac_fn_c_check_header_compile "$LINENO" "ltdl.h" "ac_cv_header_ltdl_h" "$ac_includes_default
+
+"
+if test "x$ac_cv_header_ltdl_h" = xyes; then :
+  ac_fn_c_check_decl "$LINENO" "lt_dlinterface_register" "ac_cv_have_decl_lt_dlinterface_register" "$ac_includes_default
+	    #include <ltdl.h>
+"
+if test "x$ac_cv_have_decl_lt_dlinterface_register" = xyes; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for lt_dladvise_preload in -lltdl" >&5
+$as_echo_n "checking for lt_dladvise_preload in -lltdl... " >&6; }
+if ${ac_cv_lib_ltdl_lt_dladvise_preload+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lltdl  $LIBS"
+if test x$gcc_no_link = xyes; then
+  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
+fi
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char lt_dladvise_preload ();
+int
+main ()
+{
+return lt_dladvise_preload ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_ltdl_lt_dladvise_preload=yes
+else
+  ac_cv_lib_ltdl_lt_dladvise_preload=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ltdl_lt_dladvise_preload" >&5
+$as_echo "$ac_cv_lib_ltdl_lt_dladvise_preload" >&6; }
+if test "x$ac_cv_lib_ltdl_lt_dladvise_preload" = xyes; then :
+  with_included_ltdl=no
+else
+  with_included_ltdl=yes
+fi
+
+else
+  with_included_ltdl=yes
+fi
+
+else
+  with_included_ltdl=yes
+fi
+
+
+fi
+
+
+
+
+
+
+
+
+# Check whether --with-ltdl_include was given.
+if test "${with_ltdl_include+set}" = set; then :
+  withval=$with_ltdl_include;
+fi
+
+
+if test -n "$with_ltdl_include"; then
+  if test -f "$with_ltdl_include/ltdl.h"; then :
+  else
+    as_fn_error $? "invalid ltdl include directory: '$with_ltdl_include'" "$LINENO" 5
+  fi
+else
+  with_ltdl_include=no
+fi
+
+
+# Check whether --with-ltdl_lib was given.
+if test "${with_ltdl_lib+set}" = set; then :
+  withval=$with_ltdl_lib;
+fi
+
+
+if test -n "$with_ltdl_lib"; then
+  if test -f "$with_ltdl_lib/libltdl.la"; then :
+  else
+    as_fn_error $? "invalid ltdl library directory: '$with_ltdl_lib'" "$LINENO" 5
+  fi
+else
+  with_ltdl_lib=no
+fi
+
+case ,$with_included_ltdl,$with_ltdl_include,$with_ltdl_lib, in
+  ,yes,no,no,)
+	case $enable_ltdl_convenience in
+  no) as_fn_error $? "this package needs a convenience libltdl" "$LINENO" 5 ;;
+  "") enable_ltdl_convenience=yes
+      ac_configure_args="$ac_configure_args --enable-ltdl-convenience" ;;
+esac
+LIBLTDL='$(top_build_prefix)'"${lt_ltdl_dir+$lt_ltdl_dir/}libltdlc.la"
+LTDLDEPS=$LIBLTDL
+LTDLINCL='-I$(top_srcdir)'"${lt_ltdl_dir+/$lt_ltdl_dir}"
+
+
+
+
+
+# For backwards non-gettext consistent compatibility...
+INCLTDL=$LTDLINCL
+
+
+	;;
+  ,no,no,no,)
+	# If the included ltdl is not to be used, then use the
+	# preinstalled libltdl we found.
+
+$as_echo "#define HAVE_LTDL 1" >>confdefs.h
+
+	LIBLTDL=-lltdl
+	LTDLDEPS=
+	LTDLINCL=
+	;;
+  ,no*,no,*)
+	as_fn_error $? "'--with-ltdl-include' and '--with-ltdl-lib' options must be used together" "$LINENO" 5
+	;;
+  *)	with_included_ltdl=no
+	LIBLTDL="-L$with_ltdl_lib -lltdl"
+	LTDLDEPS=
+	LTDLINCL=-I$with_ltdl_include
+	;;
+esac
+INCLTDL=$LTDLINCL
+
+# Report our decision...
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find libltdl headers" >&5
+$as_echo_n "checking where to find libltdl headers... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $LTDLINCL" >&5
+$as_echo "$LTDLINCL" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find libltdl library" >&5
+$as_echo_n "checking where to find libltdl library... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $LIBLTDL" >&5
+$as_echo "$LIBLTDL" >&6; }
+
+
+
+# Check whether --enable-ltdl-install was given.
+if test "${enable_ltdl_install+set}" = set; then :
+  enableval=$enable_ltdl_install;
+fi
+
+
+case ,$enable_ltdl_install,$enable_ltdl_convenience in
+  *yes*) ;;
+  *) enable_ltdl_convenience=yes ;;
+esac
+
+ if test no != "${enable_ltdl_install-no}"; then
+  INSTALL_LTDL_TRUE=
+  INSTALL_LTDL_FALSE='#'
+else
+  INSTALL_LTDL_TRUE='#'
+  INSTALL_LTDL_FALSE=
+fi
+
+  if test no != "${enable_ltdl_convenience-no}"; then
+  CONVENIENCE_LTDL_TRUE=
+  CONVENIENCE_LTDL_FALSE='#'
+else
+  CONVENIENCE_LTDL_TRUE='#'
+  CONVENIENCE_LTDL_FALSE=
+fi
+
+
+
+    subdirs="$subdirs libltdl"
+
+
+
+
+# In order that ltdl.c can compile, find out the first AC_CONFIG_HEADERS
+# the user used.  This is so that ltdl.h can pick up the parent projects
+# config.h file, The first file in AC_CONFIG_HEADERS must contain the
+# definitions required by ltdl.c.
+# FIXME: Remove use of undocumented AC_LIST_HEADERS (2.59 compatibility).
+
+
+
+for ac_header in unistd.h dl.h sys/dl.h dld.h mach-o/dyld.h dirent.h
+do :
+  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ac_fn_c_check_header_compile "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default
+"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+
+done
+
+
+for ac_func in closedir opendir readdir
+do :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+
+else
+
+
+  _LT_LIBOBJS="$_LT_LIBOBJS lt__dirent.$ac_objext"
+
+fi
+done
+
+for ac_func in strlcat strlcpy
+do :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+
+else
+
+
+  _LT_LIBOBJS="$_LT_LIBOBJS lt__strl.$ac_objext"
+
+fi
+done
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define LT_LIBEXT "$libext"
+_ACEOF
+
+
+name=
+eval "lt_libprefix=\"$libname_spec\""
+
+cat >>confdefs.h <<_ACEOF
+#define LT_LIBPREFIX "$lt_libprefix"
+_ACEOF
+
+
+name=ltdl
+eval "LTDLOPEN=\"$libname_spec\""
+
+
+
+
+
+
+
+
+# Only expand once:
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lt_dlhandle_map in -lltdl" >&5
+$as_echo_n "checking for lt_dlhandle_map in -lltdl... " >&6; }
+if ${ac_cv_lib_ltdl_lt_dlhandle_map+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lltdl  $LIBS"
+if test x$gcc_no_link = xyes; then
+  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
+fi
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char lt_dlhandle_map ();
+int
+main ()
+{
+return lt_dlhandle_map ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_ltdl_lt_dlhandle_map=yes
+else
+  ac_cv_lib_ltdl_lt_dlhandle_map=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ltdl_lt_dlhandle_map" >&5
+$as_echo "$ac_cv_lib_ltdl_lt_dlhandle_map" >&6; }
+if test "x$ac_cv_lib_ltdl_lt_dlhandle_map" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBLTDL 1
+_ACEOF
+
+  LIBS="-lltdl $LIBS"
+
+else
+  as_fn_error $? "installed libltdl is too old" "$LINENO" 5
+fi
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking what variable specifies run-time module search path" >&5
+$as_echo_n "checking what variable specifies run-time module search path... " >&6; }
+if ${lt_cv_module_path_var+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  lt_cv_module_path_var=$shlibpath_var
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_module_path_var" >&5
+$as_echo "$lt_cv_module_path_var" >&6; }
+if test -n "$lt_cv_module_path_var"; then
+
+cat >>confdefs.h <<_ACEOF
+#define LT_MODULE_PATH_VAR "$lt_cv_module_path_var"
+_ACEOF
+
+fi
+
 
 
 
@@ -19423,9 +20078,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-
-
-subdirs="$subdirs classpath libltdl"
+subdirs="$subdirs classpath"
 
 
 # The -no-testsuite modules omit the test subdir.
@@ -19712,6 +20365,14 @@ $as_echo "#define USE_LIBFFI 1" >>confdefs.h
    LIBFFIINCS='-I$(top_srcdir)/../libffi/include -I../libffi/include'
 fi
 
+
+ if test "$with_libffi" != "no"; then
+  USE_LIBFFI_TRUE=
+  USE_LIBFFI_FALSE='#'
+else
+  USE_LIBFFI_TRUE='#'
+  USE_LIBFFI_FALSE=
+fi
 
 
 # See if the user wants to disable JVMPI support.
@@ -25376,6 +26037,31 @@ if test -z "${X_AWT_TRUE}" && test -z "${X_AWT_FALSE}"; then
   as_fn_error $? "conditional \"X_AWT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${INSTALL_LTDL_TRUE}" && test -z "${INSTALL_LTDL_FALSE}"; then
+  as_fn_error $? "conditional \"INSTALL_LTDL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${CONVENIENCE_LTDL_TRUE}" && test -z "${CONVENIENCE_LTDL_FALSE}"; then
+  as_fn_error $? "conditional \"CONVENIENCE_LTDL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+LT_CONFIG_H=include/config.h
+
+    _ltdl_libobjs=
+    _ltdl_ltlibobjs=
+    if test -n "$_LT_LIBOBJS"; then
+      # Remove the extension.
+      _lt_sed_drop_objext='s/\.o$//;s/\.obj$//'
+      for i in `for i in $_LT_LIBOBJS; do echo "$i"; done | $SED "$_lt_sed_drop_objext" | sort -u`; do
+        _ltdl_libobjs="$_ltdl_libobjs $lt_libobj_prefix$i.$ac_objext"
+        _ltdl_ltlibobjs="$_ltdl_ltlibobjs $lt_libobj_prefix$i.lo"
+      done
+    fi
+    ltdl_LIBOBJS=$_ltdl_libobjs
+
+    ltdl_LTLIBOBJS=$_ltdl_ltlibobjs
+
+
 if test -z "${am__fastdepGCJ_TRUE}" && test -z "${am__fastdepGCJ_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepGCJ\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -25410,6 +26096,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${INTERPRETER_TRUE}" && test -z "${INTERPRETER_FALSE}"; then
   as_fn_error $? "conditional \"INTERPRETER\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${USE_LIBFFI_TRUE}" && test -z "${USE_LIBFFI_FALSE}"; then
+  as_fn_error $? "conditional \"USE_LIBFFI\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USING_WIN32_PLATFORM_TRUE}" && test -z "${USING_WIN32_PLATFORM_FALSE}"; then

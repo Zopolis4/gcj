@@ -76,9 +76,7 @@ details.  */
 
 #include <gnu/java/lang/MainThread.h>
 
-#ifdef USE_LTDL
 #include <ltdl.h>
-#endif
 
 // Execution engine for compiled code.
 _Jv_CompiledEngine _Jv_soleCompiledEngine;
@@ -1390,7 +1388,6 @@ parse_verbose_args (char* option_string,
 static jint
 load_jvmti_agent (const char *name)
 {
-#ifdef USE_LTDL
   if (lt_dlinit ())
     {
       fprintf (stderr, 
@@ -1433,11 +1430,6 @@ load_jvmti_agent (const char *name)
       fprintf (stderr, "libgcj: Library %s not found in library path.\n", name);
       return -3;
     }
-
-#endif /* USE_LTDL */
-
-  // If LTDL cannot be used, return an error code indicating this.
-  return -99;
 }
 #endif // INTERPRETER
 
@@ -1674,9 +1666,7 @@ _Jv_CreateJavaVM (JvVMInitArgs* vm_args)
 
   no_memory = new java::lang::OutOfMemoryError;
 
-#ifdef USE_LTDL
   LTDL_SET_PRELOADED_SYMBOLS ();
-#endif
 
   _Jv_platform_initialize ();
 
