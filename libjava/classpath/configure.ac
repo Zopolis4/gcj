@@ -532,7 +532,7 @@ if test "x${COMPILE_JNI}" = xyes; then
   AC_SUBST(LIBMAGIC)
 
   AC_MSG_CHECKING([whether struct sockaddr_in6 is in netinet/in.h])
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <netinet/in.h>]], [[struct sockaddr_in6 addr6;]])],
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <netinet/in.h>]], [[struct sockaddr_in6 addr6;]])],
                     [AC_DEFINE(HAVE_INET6, 1,
                      [Define if inet6 structures are defined in netinet/in.h.])
                      AC_MSG_RESULT(yes)],
@@ -543,7 +543,7 @@ if test "x${COMPILE_JNI}" = xyes; then
   AC_STRUCT_TIMEZONE
 
   AC_MSG_CHECKING([for tm_gmtoff in struct tm])
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <time.h>]],[[struct tm tim; tim.tm_gmtoff = 0;]])],
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <time.h>]],[[struct tm tim; tim.tm_gmtoff = 0;]])],
   [AC_DEFINE(STRUCT_TM_HAS_GMTOFF, 1, [Define if struct tm has tm_gmtoff field.])
    AC_MSG_RESULT(yes)],
   [AC_MSG_RESULT(no)
@@ -552,13 +552,13 @@ if test "x${COMPILE_JNI}" = xyes; then
    dnl when cross-compiling.  So instead we make an assumption that
    dnl the header file will mention timezone if it exists.
    dnl Don't find the win32 function timezone
-   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <time.h>]], [[void i(){long z2 = 2*timezone;}]])],
+   AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <time.h>]], [[void i(){long z2 = 2*timezone;}]])],
      [AC_DEFINE(HAVE_TIMEZONE, 1, [Define if global 'timezone' exists.])
       AC_MSG_RESULT(yes)],
      [AC_MSG_RESULT(no)
        AC_MSG_CHECKING([for global _timezone variable])
        dnl FIXME: As above, don't want link check
-       AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <time.h>]], [[long z2 = _timezone;]])],
+       AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <time.h>]], [[long z2 = _timezone;]])],
          [AC_DEFINE(HAVE_UNDERSCORE_TIMEZONE, 1,
             [Define if your platform has the global _timezone variable.])
           AC_MSG_RESULT(yes)],
@@ -765,7 +765,7 @@ if test "x${COMPILE_JNI}" = xyes; then
   dnl Check for MSG_NOSIGNAL
   dnl **********************************************************************
   AC_MSG_CHECKING(for MSG_NOSIGNAL)
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/socket.h>]], [[ int f = MSG_NOSIGNAL; ]])],[ AC_MSG_RESULT(yes)
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <sys/socket.h>]], [[ int f = MSG_NOSIGNAL; ]])],[ AC_MSG_RESULT(yes)
      AC_DEFINE(HAVE_MSG_NOSIGNAL, 1,
      	       [Define this symbol if you have MSG_NOSIGNAL]) ],[ AC_MSG_RESULT(no)
   ])
@@ -773,7 +773,7 @@ if test "x${COMPILE_JNI}" = xyes; then
  dnl Check for SO_NOSIGPIPE (Darwin equivalent for MSG_NOSIGNAL)
  dnl **********************************************************************
  AC_MSG_CHECKING(for SO_NOSIGPIPE )
- AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/socket.h>]], [[ int f = SO_NOSIGPIPE; ]])],[ AC_MSG_RESULT(yes)
+ AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <sys/socket.h>]], [[ int f = SO_NOSIGPIPE; ]])],[ AC_MSG_RESULT(yes)
     AC_DEFINE(HAVE_SO_NOSIGPIPE, 1,
     	      [Define this symbol if you have SO_NOSIGPIPE]) ],[ AC_MSG_RESULT(no)
  ])
@@ -781,7 +781,7 @@ if test "x${COMPILE_JNI}" = xyes; then
   dnl Check for MSG_WAITALL
   dnl **********************************************************************
   AC_MSG_CHECKING(for MSG_WAITALL)
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/socket.h>]], [[ int f = MSG_WAITALL; ]])],[ AC_MSG_RESULT(yes)
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <sys/socket.h>]], [[ int f = MSG_WAITALL; ]])],[ AC_MSG_RESULT(yes)
      AC_DEFINE(HAVE_MSG_WAITALL, 1,
      	       [Define this symbol if you have MSG_WAITALL]) ],[ AC_MSG_RESULT(no)
   ])
