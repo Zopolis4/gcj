@@ -1587,6 +1587,12 @@ D interface file.
 @item @var{file}.dd
 D documentation code (Ddoc).
 
+@c FIXME: Descriptions of Java file types.
+@c @var{file}.java
+@c @var{file}.class
+@c @var{file}.zip
+@c @var{file}.jar
+
 @item @var{file}.ads
 Ada source code file that contains a library unit declaration (a
 declaration of a package, subprogram, or generic, or a generic
@@ -1633,6 +1639,7 @@ ada
 d
 f77  f77-cpp-input f95  f95-cpp-input
 go
+java
 @end smallexample
 
 @item -x none
@@ -4849,7 +4856,7 @@ accomplished via the comm page.
 @item -fobjc-exceptions
 @opindex fobjc-exceptions
 Enable syntactic support for structured exception handling in
-Objective-C, similar to what is offered by C++.  This option
+Objective-C, similar to what is offered by C++ and Java.  This option
 is required to use the Objective-C keywords @code{@@try},
 @code{@@throw}, @code{@@catch}, @code{@@finally} and
 @code{@@synchronized}.  This option is available with both the GNU
@@ -17714,7 +17721,7 @@ of these is when the application wishes to throw and catch exceptions
 across different shared libraries.  In that case, each of the libraries
 as well as the application itself should use the shared @file{libgcc}.
 
-Therefore, the G++ driver automatically adds @option{-shared-libgcc}
+Therefore, the G++ and GCJ drivers automatically add @option{-shared-libgcc}
 whenever you build a shared library or a main executable, because C++
 programs typically use exceptions, so this is the right thing to do.
 
@@ -17730,7 +17737,8 @@ propagate through such shared libraries, without incurring relocation
 costs at library load time.
 
 However, if a library or main executable is supposed to throw or catch
-exceptions, you must link it using the G++ driver, or using the option
+exceptions, you must link it using the G++ or GCJ driver, as appropriate
+for the languages used in the program, or using the option
 @option{-shared-libgcc}, such that it is linked with the shared
 @file{libgcc}.
 
@@ -18053,7 +18061,8 @@ results in @option{-ftrapv} being effective.
 This option instructs the compiler to assume that signed arithmetic
 overflow of addition, subtraction and multiplication wraps around
 using twos-complement representation.  This flag enables some optimizations
-and disables others.
+and disables others.  This option is enabled by default for the Java
+front end, as required by the Java language specification.
 The options @option{-ftrapv} and @option{-fwrapv} override each other, so using
 @option{-ftrapv} @option{-fwrapv} on the command-line results in
 @option{-fwrapv} being effective.  Note that only active options override, so

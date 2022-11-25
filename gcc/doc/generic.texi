@@ -43,6 +43,7 @@ seems inelegant.
 * Functions::           	Function bodies, linkage, and other aspects.
 * Language-dependent trees::    Topics and trees specific to language front ends.
 * C and C++ Trees::     	Trees specific to C and C++.
+* Java Trees:: 	                Trees specific to Java.
 @end menu
 
 @c ---------------------------------------------------------------------
@@ -3617,3 +3618,7 @@ In either case, the expression is void.
 
 
 @end table
+
+
+@node Java Trees
+@section Java Trees
