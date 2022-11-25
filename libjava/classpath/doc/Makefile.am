@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = info-in-builddir
+
 SUBDIRS = api
 
 EXTRA_DIST = README.jaxp texi2pod.pl $(man_MANS)

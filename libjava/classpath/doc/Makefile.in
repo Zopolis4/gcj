@@ -459,6 +459,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 uudecode = @uudecode@
 vm_classes = @vm_classes@
+AUTOMAKE_OPTIONS = info-in-builddir
 SUBDIRS = api
 EXTRA_DIST = README.jaxp texi2pod.pl $(man_MANS)
 TEXINFO_TEX = ../../gcc/doc/include/texinfo.tex
