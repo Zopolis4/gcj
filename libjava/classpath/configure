@@ -24338,6 +24338,8 @@ fi
 
 
 
+
+
 # Extract the first word of "find", so it can be a program name with args.
 set dummy find; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -25559,7 +25561,7 @@ else
 JAVA_TEST=Object.java
 CLASS_TEST=Object.class
 cat << \EOF > $JAVA_TEST
-/* #line 25562 "configure" */
+/* #line 25564 "configure" */
 package java.lang;
 
 public class Object
@@ -25652,7 +25654,7 @@ EOF
 if uudecode$EXEEXT Test.uue; then
         ac_cv_prog_uudecode_base64=yes
 else
-        echo "configure: 25655: uudecode had trouble decoding base 64 file 'Test.uue'" >&5
+        echo "configure: 25657: uudecode had trouble decoding base 64 file 'Test.uue'" >&5
         echo "configure: failed file was:" >&5
         cat Test.uue >&5
         ac_cv_prog_uudecode_base64=no
@@ -25680,7 +25682,7 @@ JAVA_TEST=Test.java
 CLASS_TEST=Test.class
 TEST=Test
 cat << \EOF > $JAVA_TEST
-/* [#]line 25683 "configure" */
+/* [#]line 25685 "configure" */
 public class Test {
 public static void main (String args[]) {
         System.exit (0);
@@ -25888,7 +25890,7 @@ if test "x${use_glibj_zip}" = xfalse || \
   JAVA_TEST=Test.java
   CLASS_TEST=Test.class
   cat << \EOF > $JAVA_TEST
-  /* #line 25891 "configure" */
+  /* #line 25893 "configure" */
   public class Test
   {
     public static void main(String args)

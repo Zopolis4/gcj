@@ -1008,6 +1008,8 @@ AC_PATH_PROG(MKDIR, mkdir)
 AC_PATH_PROG(CP, cp)
 AC_PATH_PROG(DATE, date)
 
+AC_PROG_MKDIR_P
+
 dnl -----------------------------------------------------------
 dnl According to the GNU coding guide, we shouldn't require find, 
 dnl and zip, however GNU provides both so it should be okay 
