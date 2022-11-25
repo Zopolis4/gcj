@@ -930,48 +930,174 @@ AC_SUBST(LIBMATHSPEC)
 
 AC_SUBST(LIBGCJTESTSPEC)
 
-# Allow the GC to be disabled.  Can be useful when debugging.
-AC_MSG_CHECKING([for garbage collector to use])
+AC_MSG_CHECKING([if garbage collector is enabled])
 AC_ARG_ENABLE(java-gc,
-  AS_HELP_STRING([--enable-java-gc=TYPE],
-                 [choose garbage collector (default is boehm)]),
-  [GC=$enableval],
-  [GC=boehm])
-GCLIBS=
-GCINCS=
-GCDEPS=
-GCSPEC=
-JC1GCSPEC=
-GCTESTSPEC=
-case "$GC" in
- boehm)
-    AC_MSG_RESULT(boehm)
-    GCLIBS=../boehm-gc/libgcjgc_convenience.la
-    JC1GCSPEC='-fuse-boehm-gc'
-    GCTESTSPEC="-L`${PWDCMD-pwd}`/../boehm-gc/.libs -rpath `${PWDCMD-pwd}`/../boehm-gc/.libs"
-    GCINCS='-I$(top_srcdir)/../boehm-gc/include -I../boehm-gc/include'
-    GCOBJS=boehm.lo    
-    GCHDR=boehm-gc.h
-    # The POSIX thread support needs to know this.
-    AC_DEFINE(HAVE_BOEHM_GC, 1, [Define if Boehm GC in use.])
+[AS_HELP_STRING([[--enable-java-gc[=ARG]]],
+    [enable the use of the bdw-gc garbage collector with libjava @<:@ARG={default,yes,no}@:>@])],
+[USE_GC=$enableval],
+[USE_GC=yes])
+AC_ARG_WITH([target-bdw-gc],
+[AS_HELP_STRING([--with-target-bdw-gc=PATHLIST],
+    [specify prefix directory for installed bdw-gc package.
+     Equivalent to --with-target-bdw-gc-include=PATH/include
+     plus --with-target-bdw-gc-lib=PATH/lib])])
+AC_ARG_WITH([target-bdw-gc-include],
+[AS_HELP_STRING([--with-target-bdw-gc-include=PATHLIST],
+    [specify directories for installed bdw-gc include files])])
+AC_ARG_WITH([target-bdw-gc-lib],
+[AS_HELP_STRING([--with-target-bdw-gc-lib=PATHLIST],
+    [specify directories for installed bdw-gc library])])
+
+case "${USE_GC}" in
+no)
+  use_bdw_gc=no
+  ;;
+yes|default)
+  AC_MSG_CHECKING([for bdw garbage collector])
+  if test "x$with_target_bdw_gc$with_target_bdw_gc_include$with_target_bdw_gc_lib" = x; then
+    dnl no bdw-gw options, assuming bdw-gc in default locations
+    BDW_GC_CFLAGS=
+    GCLIBS="-lgc"
+  else
+    dnl bdw-gw options passed by configure flags
+    if test "x$with_target_bdw_gc_include" = x && test "x$with_target_bdw_gc_lib" != x; then
+      AC_MSG_ERROR([found --with-target-bdw-gc-lib but --with-target-bdw-gc-include missing])
+    elif test "x$with_target_bdw_gc_include" != x && test "x$with_target_bdw_gc_lib" = x; then
+      AC_MSG_ERROR([found --with-target-bdw-gc-include but --with-target-bdw-gc-lib missing])
+    else
+      AC_MSG_RESULT([using paths configured with --with-target-bdw-gc options])
+    fi
+    mldir=`${CC-gcc} --print-multi-directory 2>/dev/null`
+    bdw_val=
+    if test "x$with_target_bdw_gc" != x; then
+      for i in `echo $with_target_bdw_gc | tr ',' ' '`; do
+        case "$i" in
+          *=*) sd=${i%%=*}; d=${i#*=} ;;
+          *) sd=.; d=$i ;;
+        esac
+        if test "$mldir" = "$sd"; then
+          bdw_val=$d
+        fi
+      done
+      if test "x$bdw_val" = x; then
+        AC_MSG_ERROR([no multilib path ($mldir) found in --with-target-bdw-gc])
+      fi
+      bdw_inc_dir="$bdw_val/include"
+      bdw_lib_dir="$bdw_val/lib"
+    fi
+    bdw_val=
+    if test "x$with_target_bdw_gc_include" != x; then
+      for i in `echo $with_target_bdw_gc_include | tr ',' ' '`; do
+        case "$i" in
+          *=*) sd=${i%%=*}; d=${i#*=} ;;
+          *) sd=.; d=$i; fallback=$i ;;
+        esac
+        if test "$mldir" = "$sd"; then
+          bdw_val=$d
+        fi
+      done
+      if test "x$bdw_val" = x && test "x$bdw_inc_dir" = x && test "x$fallback" != x; then
+        bdw_inc_dir="$fallback"
+      elif test "x$bdw_val" = x; then
+        AC_MSG_ERROR([no multilib path ($mldir) found in --with-target-bdw-gc-include])
+      else
+        bdw_inc_dir="$bdw_val"
+      fi
+    fi
+    bdw_val=
+    if test "x$with_target_bdw_gc_lib" != x; then
+      for i in `echo $with_target_bdw_gc_lib | tr ',' ' '`; do
+        case "$i" in
+          *=*) sd=${i%%=*}; d=${i#*=} ;;
+          *) sd=.; d=$i ;;
+        esac
+        if test "$mldir" = "$sd"; then
+          bdw_val=$d
+        fi
+      done
+      if test "x$bdw_val" = x; then
+        AC_MSG_ERROR([no multilib path ($mldir) found in --with-target-bdw-gc-lib])
+      fi
+      bdw_lib_dir="$bdw_val"
+    fi
+    if test "x$bdw_inc_dir" = x; then
+      AC_MSG_ERROR([no multilib path ($mldir) found in --with-target-bdw-gc-include])
+    fi
+    if test "x$bdw_lib_dir" = x; then
+      AC_MSG_ERROR([no multilib path ($mldir) found in --with-target-bdw-gc-lib])
+    fi
+    BDW_GC_CFLAGS="-I$bdw_inc_dir"
+    if test -f $bdw_lib_dir/libgc.la; then
+      GCLIBS="$bdw_lib_dir/libgc.la"
+    else
+      GCLIBS="-L$bdw_lib_dir -lgc"
+    fi
+    AC_MSG_RESULT([found])
+  fi
+
+  case "$GCLIBS" in
+  *libgc.la)
+    use_bdw_gc=yes
     ;;
- no)
-    AC_MSG_RESULT(none)
-    GCHDR=no-gc.h
-    ;;
- *)
-    AC_MSG_ERROR([unrecognized collector "$GC"])
-    ;;
+  *)
+    AC_MSG_CHECKING([for system boehm-gc])
+    save_CFLAGS=$CFLAGS
+    save_LIBS=$LIBS
+    CFLAGS="$CFLAGS $BDW_GC_CFLAGS"
+    LIBS="$LIBS $GCLIBS"
+    dnl the link test is not good enough for ARM32 multilib detection,
+    dnl first check to link, then to run
+    AC_LINK_IFELSE(
+      [AC_LANG_PROGRAM([#include <gc/gc.h>],[GC_init()])],
+      [
+        AC_RUN_IFELSE([AC_LANG_SOURCE([[
+          #include <gc/gc.h>
+          int main() {
+            GC_init();
+            return 0;
+          }
+          ]])],
+          [system_bdw_gc_found=yes],
+          [system_bdw_gc_found=no],
+          dnl assume no system boehm-gc for cross builds ...
+          [system_bdw_gc_found=no]
+        )
+      ],
+      [system_bdw_gc_found=no])
+    CFLAGS=$save_CFLAGS
+    LIBS=$save_LIBS
+    if test x$enable_objc_gc = xauto && test x$system_bdw_gc_found = xno; then
+      AC_MSG_ERROR([bdw-gc not found])
+      use_bdw_gc=no
+    elif test x$enable_objc_gc = xyes && test x$system_bdw_gc_found = xno; then
+      AC_MSG_ERROR([bdw-gc not found])
+    else
+      use_bdw_gc=yes
+      AC_MSG_RESULT([found])
+    fi
+  esac
 esac
+
+AC_CHECK_LIB([gc], [GC_iterate_free_hblks], [], [AC_MSG_ERROR([installed boehm-gc is too old])])
+
+if test "$use_bdw_gc" = no; then
+  AC_MSG_ERROR([bdw-gc not found])
+  GCLIBS=
+  GCINCS=
+  GCHDR=no-gc.h
+else
+  GCINCS=$BDW_GC_CFLAGS
+  GCLIBS=$GCLIBS
+  GCHDR=boehm-gc.h
+  # The POSIX thread support needs to know this.
+  AC_DEFINE(HAVE_BOEHM_GC, 1, [Define if Boehm GC in use.])
+fi
+
 AC_SUBST(GCLIBS)
 AC_SUBST(GCINCS)
-AC_SUBST(GCDEPS)
-AC_SUBST(GCSPEC)
-AC_SUBST(JC1GCSPEC)
-AC_SUBST(GCTESTSPEC)
 AC_CONFIG_LINKS(include/java-gc.h:include/$GCHDR)
-AM_CONDITIONAL(USING_BOEHMGC, test "$GC" = boehm)
-AM_CONDITIONAL(USING_NOGC, test "$GC" = no)
+AM_CONDITIONAL(USING_BOEHMGC, test "$USE_GC" = yes)
+AM_CONDITIONAL(USING_NOGC, test "$USE_GC" = no)
 
 
 AC_MSG_CHECKING([for thread model used by GCC])
@@ -1055,7 +1181,7 @@ case "$THREADS" in
 
     # If we're using the Boehm GC, then we happen to know that it
     # defines _REENTRANT, so we don't bother.  Eww.
-    if test "$GC" != boehm; then
+    if test "$USE_GC" = no; then
        AC_DEFINE(_REENTRANT, 1, [Required define if using POSIX threads])
     fi
     AC_DEFINE(_POSIX_PTHREAD_SEMANTICS, 1, [Required define if using POSIX threads])
@@ -1412,7 +1538,7 @@ else
 
    # On Solaris, and maybe other architectures, the Boehm collector
    # requires -ldl.
-   if test "$GC" = boehm; then
+   if test "$USE_GC" != no; then
       case "${host}" in
 	  *-*-darwin*)
 	    ;;

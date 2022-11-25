@@ -256,10 +256,6 @@ fstore-check
 Java Var(flag_store_check) Init(1)
 Enable assignability checks for stores into object arrays.
 
-fuse-boehm-gc
-Java Var(flag_use_boehm_gc)
-Generate code for the Boehm GC.
-
 fuse-divide-subroutine
 Java Var(flag_use_divide_subroutine) Init(1)
 Call a library routine to do integer divisions.

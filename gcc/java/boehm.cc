@@ -136,10 +136,6 @@ get_boehm_type_descriptor (tree type)
   int pointer_after_end = 0;
   tree field, value, value_type;
 
-  /* If the GC wasn't requested, just use a null pointer.  */
-  if (! flag_use_boehm_gc)
-    return null_pointer_node;
-
   value_type = java_type_for_mode (ptr_mode, 1);
   wide_int mask = wi::zero (TYPE_PRECISION (value_type));
 
@@ -223,8 +219,6 @@ bool
 uses_jv_markobj_p (tree dtable)
 {
   tree v;
-  /* FIXME: what do we return if !flag_use_boehm_gc ? */
-  gcc_assert (flag_use_boehm_gc);
   /* FIXME: this is wrong if TARGET_VTABLE_USES_DESCRIPTORS.  However,
      this function is only used with flag_reduced_reflection.  No
      point in asserting unless we hit the bad case.  */

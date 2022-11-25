@@ -27,7 +27,7 @@ extern "C"
 #include <java/lang/Class.h>
 #include <string.h>
 
-#include <gc_ext_config.h> // for THREAD_LOCAL_ALLOC
+#include <gc/gc.h> // for THREAD_LOCAL_ALLOC
 
 extern "C" void * GC_gcj_malloc(size_t, void *);
 extern "C" void * GC_malloc_atomic(size_t);
@@ -41,8 +41,7 @@ extern "C" void * GC_local_malloc_atomic(size_t);
 inline void *
 _Jv_AllocObj (jsize size, jclass klass)
 {
-  // This should call GC_GCJ_MALLOC, but that would involve
-  // including gc.h.
+  // FIXME: This should call GC_GCJ_MALLOC
 #ifdef THREAD_LOCAL_ALLOC
   return GC_local_gcj_malloc (size, klass->vtable);
 #else 

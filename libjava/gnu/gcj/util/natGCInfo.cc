@@ -25,44 +25,9 @@
 #include <string.h>
 #include <errno.h>
 
-//
-// Boehm GC includes.
-//
-#ifdef PACKAGE_NAME
-#undef PACKAGE_NAME
-#endif
-
-#ifdef PACKAGE_STRING
-#undef PACKAGE_STRING
-#endif
-
-#ifdef PACKAGE_TARNAME
-#undef PACKAGE_TARNAME
-#endif
-
-#ifdef PACKAGE_VERSION
-#undef PACKAGE_VERSION
-#endif
-
-#ifdef TRUE
-#undef TRUE
-#endif
-
-#ifdef FALSE
-#undef FALSE
-#endif
-
-extern "C" {
-#include "private/dbg_mlc.h"
-  int GC_n_set_marks(hdr* hhdr);
-  ptr_t GC_clear_stack(ptr_t p);
-  extern int GC_gcj_kind;
-  extern int GC_gcj_debug_kind;
-}
-
-#endif
-
-#ifdef HAVE_PROC_SELF_MAPS
+#include "gc/gc.h"
+#include "gc/gc_gcj.h"
+#include "gc/gc_mark.h"
 
 static int gc_ok = 1;
 
@@ -76,88 +41,59 @@ struct gc_debug_info
 };
 
 static void
-GC_print_debug_callback(hblk *h, word user_data)
+GC_print_debug_callback(GC_hblk_s *h, GC_word user_data)
 {
-  hdr *hhdr = HDR(h);
-  size_t bytes = WORDS_TO_BYTES(hhdr -> hb_sz);
+  size_t bytes;
 
   gc_debug_info *pinfo = (gc_debug_info *)user_data;
 
   fprintf(pinfo->fp, "ptr = %#lx, kind = %d, size = %zd, marks = %d\n",
-          (unsigned long)h, hhdr->hb_obj_kind, bytes, GC_n_set_marks(hhdr));
+	  (unsigned long)h, GC_get_kind_and_size(h, &bytes), bytes, GC_count_set_marks_in_hblk(h));
 }
 
-/*
-  this next section of definitions shouldn't really be here.
-  copied from boehmgc/allchblk.c
-*/
+struct print_hblkfl_s {
+  FILE *fp;
+  GC_word total_free;
+  int prev_index;
+};
 
-# define UNIQUE_THRESHOLD 32
-# define HUGE_THRESHOLD 256
-# define FL_COMPRESSION 8
-# define N_HBLK_FLS (HUGE_THRESHOLD - UNIQUE_THRESHOLD)/FL_COMPRESSION \
-                         + UNIQUE_THRESHOLD
-#ifndef USE_MUNMAP
-extern "C" {
-  extern word GC_free_bytes[N_HBLK_FLS+1];
+static void GC_CALLBACK print_hblkfl_file_item(struct GC_hblk_s *h, int i,
+					       GC_word client_data)
+{
+  GC_word sz;
+  print_hblkfl_s *pdata = (print_hblkfl_s *)client_data;
+
+  if (pdata->prev_index != i) {
+    fprintf(pdata->fp, "Free list %d:\n", i);
+    pdata->prev_index = i;
+  }
+
+  sz = GC_size(h);
+  fprintf(pdata->fp, "\t0x%lx size %lu ", (unsigned long)h,
+	   (unsigned long)sz);
+  pdata->total_free += sz;
+
+  if (GC_is_black_listed(h, GC_get_hblk_size()) != 0)
+    fprintf(pdata->fp, "start black listed\n");
+  else if (GC_is_black_listed(h, sz) != 0)
+    fprintf(pdata->fp, "partially black listed\n");
+  else
+    fprintf(pdata->fp, "not black listed\n");
 }
-#endif
-
-# ifdef USE_MUNMAP
-#   define IS_MAPPED(hhdr) (((hhdr) -> hb_flags & WAS_UNMAPPED) == 0)
-# else  /* !USE_MMAP */
-#   define IS_MAPPED(hhdr) 1
-# endif /* USE_MUNMAP */
 
 static void
 GC_print_hblkfreelist_file(FILE *fp)
 {
-  struct hblk * h;
-  word total_free = 0;
-  hdr * hhdr;
-  word sz;
-  int i;
+  print_hblkfl_s data;
+  data.fp = fp;
+  data.total_free = 0;
+  data.prev_index = -1;
     
   fprintf(fp, "---------- Begin free map ----------\n");
-  for (i = 0; i <= N_HBLK_FLS; ++i)
-    {
-      h = GC_hblkfreelist[i];
-#ifdef USE_MUNMAP
-      if (0 != h)
-        fprintf (fp, "Free list %ld:\n", (unsigned long)i);
-#else
-      if (0 != h)
-        fprintf (fp, "Free list %ld (Total size %ld):\n",
-                 (unsigned long)i,
-                 (unsigned long)GC_free_bytes[i]);
-#endif
-      while (h != 0)
-        {
-          hhdr = HDR(h);
-          sz = hhdr -> hb_sz;
-          fprintf (fp, "\t0x%lx size %lu ", (unsigned long)h,
-                   (unsigned long)sz);
-          total_free += sz;
-
-          if (GC_is_black_listed (h, HBLKSIZE) != 0)
-            fprintf (fp, "start black listed\n");
-          else if (GC_is_black_listed(h, hhdr -> hb_sz) != 0)
-            fprintf (fp, "partially black listed\n");
-          else
-            fprintf (fp, "not black listed\n");
-
-          h = hhdr -> hb_next;
-        }
-    }
-#ifndef USE_MUNMAP
-  if (total_free != GC_large_free_bytes)
-    {
-      fprintf (fp, "GC_large_free_bytes = %lu (INCONSISTENT!!)\n",
-               (unsigned long) GC_large_free_bytes);
-    }
-#endif
-  fprintf (fp, "Total of %lu bytes on free list\n", (unsigned long)total_free);
-  fprintf (fp, "---------- End free map ----------\n");
+  GC_iterate_free_hblks(print_hblkfl_file_item, (GC_word)&data);
+  fprintf(fp, "Total of %lu bytes on free list\n",
+	   (unsigned long)data.total_free);
+  fprintf(fp, "---------- End free map ----------\n");
 }
 
 static int GC_dump_count = 1;
@@ -173,7 +109,7 @@ GC_print_debug_info_file(FILE* fp)
   if (gc_ok)
     GC_gcollect();
   fprintf(info.fp, "---------- Begin block map ----------\n");
-  GC_apply_to_all_blocks(GC_print_debug_callback, (word)(void*)(&info));
+  GC_apply_to_all_blocks(GC_print_debug_callback, (GC_word)(void*)(&info));
   //fprintf(fp, "#Total used %d free %d wasted %d\n", info.used, info.free, info.wasted);
   //fprintf(fp, "#Total blocks %d; %dK bytes\n", info.blocks, info.blocks*4);
   fprintf(info.fp, "---------- End block map ----------\n");
@@ -194,8 +130,8 @@ namespace
     int bytes_fd;
 
     void print_address_map();
-    void enumerate_callback(struct hblk *h);
-    static void enumerate_callback_adaptor(struct hblk *h, word dummy);
+    void enumerate_callback(GC_hblk_s *h);
+    static void enumerate_callback_adaptor(GC_hblk_s *h, GC_word dummy);
   };
 }
 
@@ -300,7 +236,7 @@ GC_enumerator::enumerate()
   if (gc_ok)
     GC_gcollect();
   GC_apply_to_all_blocks(enumerate_callback_adaptor, 
-                         (word)(void*)(this));
+			 (GC_word)(void*)(this));
   fprintf(fp, "---------- End object map ----------\n");
   fflush(fp); 
 
@@ -316,25 +252,24 @@ GC_enumerator::enumerate()
 }
 
 void
-GC_enumerator::enumerate_callback_adaptor(struct hblk *h,
-                                          word dummy)
+GC_enumerator::enumerate_callback_adaptor(GC_hblk_s *h,
+					  GC_word dummy)
 {
   GC_enumerator* pinfo = (GC_enumerator*)dummy;
   pinfo->enumerate_callback(h);
 }
 
 void
-GC_enumerator::enumerate_callback(struct hblk *h)
+GC_enumerator::enumerate_callback(GC_hblk_s *h)
 {
-  hdr * hhdr = HDR(h);
-  size_t bytes = WORDS_TO_BYTES(hhdr->hb_sz);
+  size_t bytes;
   int i;
 
-  for (i = 0; i == 0 || (i + bytes <= HBLKSIZE); i += bytes)
+  for (i = 0; i == 0 || (i + bytes <= GC_get_hblk_size()); i += bytes)
     {
-      int inUse = mark_bit_from_hdr(hhdr,BYTES_TO_WORDS(i));  // in use
+      int inUse = GC_is_marked((char*)h+i);                   // in use
       char *ptr = (char*)h+i;                                 // address
-      int kind = hhdr->hb_obj_kind;                           // kind
+      int kind = GC_get_kind_and_size(h, &bytes);             // kind
       void *klass = 0;
       void *data = 0;
       if (kind == GC_gcj_kind
@@ -431,7 +366,7 @@ void
 
   J2A(name, n);
   oomDumpName = n;
-  GC_oom_fn = nomem_handler;
+  GC_set_oom_fn(nomem_handler);
 }
 
 #else  // HAVE_PROC_SELF_MAPS

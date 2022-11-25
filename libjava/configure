@@ -739,10 +739,6 @@ USING_NOGC_FALSE
 USING_NOGC_TRUE
 USING_BOEHMGC_FALSE
 USING_BOEHMGC_TRUE
-GCTESTSPEC
-JC1GCSPEC
-GCSPEC
-GCDEPS
 GCINCS
 GCLIBS
 LIBGCJTESTSPEC
@@ -1023,6 +1019,9 @@ with_ecos
 with_system_zlib
 with_x
 enable_java_gc
+with_target_bdw_gc
+with_target_bdw_gc_include
+with_target_bdw_gc_lib
 enable_rpath
 with_libiconv_prefix
 with_libiconv_type
@@ -1719,7 +1718,8 @@ Optional Features:
   --enable-interpreter    enable interpreter
   --disable-java-net      disable java.net
   --disable-jvmpi         disable JVMPI support
-  --enable-java-gc=TYPE   choose garbage collector (default is boehm)
+  --enable-java-gc[=ARG]  enable the use of the bdw-gc garbage collector with
+                          libjava [ARG={default,yes,no}]
   --disable-rpath         do not hardcode runtime library paths
   --enable-tls            Use thread-local storage [default=yes]
   --disable-symvers       disable symbol versioning for libjava
@@ -1753,6 +1753,16 @@ Optional Packages:
   --with-ecos             enable runtime eCos target support
   --with-system-zlib      use installed libz
   --with-x                use the X Window System
+  --with-target-bdw-gc=PATHLIST
+                          specify prefix directory for installed bdw-gc
+                          package. Equivalent to
+                          --with-target-bdw-gc-include=PATH/include plus
+                          --with-target-bdw-gc-lib=PATH/lib
+  --with-target-bdw-gc-include=PATHLIST
+                          specify directories for installed bdw-gc include
+                          files
+  --with-target-bdw-gc-lib=PATHLIST
+                          specify directories for installed bdw-gc library
   --with-gnu-ld           assume the C compiler uses GNU ld default=no
   --with-libiconv-prefix[=DIR]  search for libiconv in DIR/include and DIR/lib
   --without-libiconv-prefix     don't search for libiconv in includedir and libdir
@@ -13128,7 +13138,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 13131 "configure"
+#line 13141 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13234,7 +13244,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 13237 "configure"
+#line 13247 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -21426,55 +21436,264 @@ fi
 
 
 
-# Allow the GC to be disabled.  Can be useful when debugging.
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for garbage collector to use" >&5
-$as_echo_n "checking for garbage collector to use... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if garbage collector is enabled" >&5
+$as_echo_n "checking if garbage collector is enabled... " >&6; }
 # Check whether --enable-java-gc was given.
 if test "${enable_java_gc+set}" = set; then :
-  enableval=$enable_java_gc; GC=$enableval
+  enableval=$enable_java_gc; USE_GC=$enableval
 else
-  GC=boehm
+  USE_GC=yes
 fi
 
-GCLIBS=
-GCINCS=
-GCDEPS=
-GCSPEC=
-JC1GCSPEC=
-GCTESTSPEC=
-case "$GC" in
- boehm)
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: boehm" >&5
-$as_echo "boehm" >&6; }
-    GCLIBS=../boehm-gc/libgcjgc_convenience.la
-    JC1GCSPEC='-fuse-boehm-gc'
-    GCTESTSPEC="-L`${PWDCMD-pwd}`/../boehm-gc/.libs -rpath `${PWDCMD-pwd}`/../boehm-gc/.libs"
-    GCINCS='-I$(top_srcdir)/../boehm-gc/include -I../boehm-gc/include'
-    GCOBJS=boehm.lo
-    GCHDR=boehm-gc.h
-    # The POSIX thread support needs to know this.
+
+# Check whether --with-target-bdw-gc was given.
+if test "${with_target_bdw_gc+set}" = set; then :
+  withval=$with_target_bdw_gc;
+fi
+
+
+# Check whether --with-target-bdw-gc-include was given.
+if test "${with_target_bdw_gc_include+set}" = set; then :
+  withval=$with_target_bdw_gc_include;
+fi
+
+
+# Check whether --with-target-bdw-gc-lib was given.
+if test "${with_target_bdw_gc_lib+set}" = set; then :
+  withval=$with_target_bdw_gc_lib;
+fi
+
+
+case "${USE_GC}" in
+no)
+  use_bdw_gc=no
+  ;;
+yes|default)
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for bdw garbage collector" >&5
+$as_echo_n "checking for bdw garbage collector... " >&6; }
+  if test "x$with_target_bdw_gc$with_target_bdw_gc_include$with_target_bdw_gc_lib" = x; then
+        BDW_GC_CFLAGS=
+    GCLIBS="-lgc"
+  else
+        if test "x$with_target_bdw_gc_include" = x && test "x$with_target_bdw_gc_lib" != x; then
+      as_fn_error $? "found --with-target-bdw-gc-lib but --with-target-bdw-gc-include missing" "$LINENO" 5
+    elif test "x$with_target_bdw_gc_include" != x && test "x$with_target_bdw_gc_lib" = x; then
+      as_fn_error $? "found --with-target-bdw-gc-include but --with-target-bdw-gc-lib missing" "$LINENO" 5
+    else
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: using paths configured with --with-target-bdw-gc options" >&5
+$as_echo "using paths configured with --with-target-bdw-gc options" >&6; }
+    fi
+    mldir=`${CC-gcc} --print-multi-directory 2>/dev/null`
+    bdw_val=
+    if test "x$with_target_bdw_gc" != x; then
+      for i in `echo $with_target_bdw_gc | tr ',' ' '`; do
+        case "$i" in
+          *=*) sd=${i%%=*}; d=${i#*=} ;;
+          *) sd=.; d=$i ;;
+        esac
+        if test "$mldir" = "$sd"; then
+          bdw_val=$d
+        fi
+      done
+      if test "x$bdw_val" = x; then
+        as_fn_error $? "no multilib path ($mldir) found in --with-target-bdw-gc" "$LINENO" 5
+      fi
+      bdw_inc_dir="$bdw_val/include"
+      bdw_lib_dir="$bdw_val/lib"
+    fi
+    bdw_val=
+    if test "x$with_target_bdw_gc_include" != x; then
+      for i in `echo $with_target_bdw_gc_include | tr ',' ' '`; do
+        case "$i" in
+          *=*) sd=${i%%=*}; d=${i#*=} ;;
+          *) sd=.; d=$i; fallback=$i ;;
+        esac
+        if test "$mldir" = "$sd"; then
+          bdw_val=$d
+        fi
+      done
+      if test "x$bdw_val" = x && test "x$bdw_inc_dir" = x && test "x$fallback" != x; then
+        bdw_inc_dir="$fallback"
+      elif test "x$bdw_val" = x; then
+        as_fn_error $? "no multilib path ($mldir) found in --with-target-bdw-gc-include" "$LINENO" 5
+      else
+        bdw_inc_dir="$bdw_val"
+      fi
+    fi
+    bdw_val=
+    if test "x$with_target_bdw_gc_lib" != x; then
+      for i in `echo $with_target_bdw_gc_lib | tr ',' ' '`; do
+        case "$i" in
+          *=*) sd=${i%%=*}; d=${i#*=} ;;
+          *) sd=.; d=$i ;;
+        esac
+        if test "$mldir" = "$sd"; then
+          bdw_val=$d
+        fi
+      done
+      if test "x$bdw_val" = x; then
+        as_fn_error $? "no multilib path ($mldir) found in --with-target-bdw-gc-lib" "$LINENO" 5
+      fi
+      bdw_lib_dir="$bdw_val"
+    fi
+    if test "x$bdw_inc_dir" = x; then
+      as_fn_error $? "no multilib path ($mldir) found in --with-target-bdw-gc-include" "$LINENO" 5
+    fi
+    if test "x$bdw_lib_dir" = x; then
+      as_fn_error $? "no multilib path ($mldir) found in --with-target-bdw-gc-lib" "$LINENO" 5
+    fi
+    BDW_GC_CFLAGS="-I$bdw_inc_dir"
+    if test -f $bdw_lib_dir/libgc.la; then
+      GCLIBS="$bdw_lib_dir/libgc.la"
+    else
+      GCLIBS="-L$bdw_lib_dir -lgc"
+    fi
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: found" >&5
+$as_echo "found" >&6; }
+  fi
+
+  case "$GCLIBS" in
+  *libgc.la)
+    use_bdw_gc=yes
+    ;;
+  *)
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for system boehm-gc" >&5
+$as_echo_n "checking for system boehm-gc... " >&6; }
+    save_CFLAGS=$CFLAGS
+    save_LIBS=$LIBS
+    CFLAGS="$CFLAGS $BDW_GC_CFLAGS"
+    LIBS="$LIBS $GCLIBS"
+            if test x$gcc_no_link = xyes; then
+  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
+fi
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <gc/gc.h>
+int
+main ()
+{
+GC_init()
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+        if test "$cross_compiling" = yes; then :
+            system_bdw_gc_found=no
+
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+          #include <gc/gc.h>
+          int main() {
+            GC_init();
+            return 0;
+          }
+
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  system_bdw_gc_found=yes
+else
+  system_bdw_gc_found=no
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+
+else
+  system_bdw_gc_found=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+    CFLAGS=$save_CFLAGS
+    LIBS=$save_LIBS
+    if test x$enable_objc_gc = xauto && test x$system_bdw_gc_found = xno; then
+      as_fn_error $? "bdw-gc not found" "$LINENO" 5
+      use_bdw_gc=no
+    elif test x$enable_objc_gc = xyes && test x$system_bdw_gc_found = xno; then
+      as_fn_error $? "bdw-gc not found" "$LINENO" 5
+    else
+      use_bdw_gc=yes
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: found" >&5
+$as_echo "found" >&6; }
+    fi
+  esac
+esac
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for GC_iterate_free_hblks in -lgc" >&5
+$as_echo_n "checking for GC_iterate_free_hblks in -lgc... " >&6; }
+if ${ac_cv_lib_gc_GC_iterate_free_hblks+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgc  $LIBS"
+if test x$gcc_no_link = xyes; then
+  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
+fi
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char GC_iterate_free_hblks ();
+int
+main ()
+{
+return GC_iterate_free_hblks ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_gc_GC_iterate_free_hblks=yes
+else
+  ac_cv_lib_gc_GC_iterate_free_hblks=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gc_GC_iterate_free_hblks" >&5
+$as_echo "$ac_cv_lib_gc_GC_iterate_free_hblks" >&6; }
+if test "x$ac_cv_lib_gc_GC_iterate_free_hblks" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBGC 1
+_ACEOF
+
+  LIBS="-lgc $LIBS"
+
+else
+  as_fn_error $? "installed boehm-gc is too old" "$LINENO" 5
+fi
+
+
+if test "$use_bdw_gc" = no; then
+  as_fn_error $? "bdw-gc not found" "$LINENO" 5
+  GCLIBS=
+  GCINCS=
+  GCHDR=no-gc.h
+else
+  GCINCS=$BDW_GC_CFLAGS
+  GCLIBS=$GCLIBS
+  GCHDR=boehm-gc.h
+  # The POSIX thread support needs to know this.
 
 $as_echo "#define HAVE_BOEHM_GC 1" >>confdefs.h
 
-    ;;
- no)
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: none" >&5
-$as_echo "none" >&6; }
-    GCHDR=no-gc.h
-    ;;
- *)
-    as_fn_error $? "unrecognized collector \"$GC\"" "$LINENO" 5
-    ;;
-esac
-
-
-
+fi
 
 
 
 ac_config_links="$ac_config_links include/java-gc.h:include/$GCHDR"
 
- if test "$GC" = boehm; then
+ if test "$USE_GC" = yes; then
   USING_BOEHMGC_TRUE=
   USING_BOEHMGC_FALSE='#'
 else
@@ -21482,7 +21701,7 @@ else
   USING_BOEHMGC_FALSE=
 fi
 
- if test "$GC" = no; then
+ if test "$USE_GC" = no; then
   USING_NOGC_TRUE=
   USING_NOGC_FALSE='#'
 else
@@ -21579,7 +21798,7 @@ $as_echo "#define HAVE_PTHREAD_MUTEXATTR_INIT 1" >>confdefs.h
 
     # If we're using the Boehm GC, then we happen to know that it
     # defines _REENTRANT, so we don't bother.  Eww.
-    if test "$GC" != boehm; then
+    if test "$USE_GC" = no; then
 
 $as_echo "#define _REENTRANT 1" >>confdefs.h
 
@@ -24148,7 +24367,7 @@ fi
 
    # On Solaris, and maybe other architectures, the Boehm collector
    # requires -ldl.
-   if test "$GC" = boehm; then
+   if test "$USE_GC" != no; then
       case "${host}" in
 	  *-*-darwin*)
 	    ;;
