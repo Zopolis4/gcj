@@ -499,8 +499,6 @@ initialize_builtins (void)
       java_builtins[i].method_name.t = m;
     }
 
-  void_list_node = end_params_node;
-
   float_ftype_float_float
     = build_function_type_list (float_type_node,
 				float_type_node, float_type_node, NULL_TREE);
