@@ -957,7 +957,7 @@ java_init_decl_processing (void)
   build_decl (BUILTINS_LOCATION,
 	      TYPE_DECL, get_identifier ("Method"), method_type_node);
 
-  end_params_node = tree_cons (NULL_TREE, void_type_node, NULL_TREE);
+  end_params_node = void_list_node;
 
   t = build_function_type_list (ptr_type_node, class_ptr_type, NULL_TREE);
   alloc_object_node = add_builtin_function ("_Jv_AllocObject", t,
