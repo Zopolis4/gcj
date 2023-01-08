@@ -59,26 +59,26 @@ int shared_libgcc = 1;
 static const char jvgenmain_spec[] =
   "jvgenmain %{findirect-dispatch} %{D*} %w%b %m.i |\n\
    cc1 %m.i %1 \
-		   %{!Q:-quiet} -dumpbase %b.c %{d*} %{m*}\
-		   %{g*} %{O*} %I \
-		   %{v:-version} %{pg:-p} %{p}\
-		   %<fbounds-check %<fno-bounds-check\
-		   %<fassume-compiled* %<fno-assume-compiled*\
-		   %<fcompile-resource* %<fassert %<fno-assert \
-		   %<femit-class-file %<femit-class-files %<fencoding*\
-		   %<fuse-boehm-gc %<fhash-synchronization %<fjni\
-		   %<findirect-dispatch\
-		   %<fno-store-check %<foutput-class-dir\
-		   %<fclasspath* %<fbootclasspath*\
-		   %<fextdirs*\
-		   %<fuse-divide-subroutine %<fno-use-divide-subroutine\
-		   %<fuse-atomic-builtins %<fno-use-atomic-builtins\
-		   %<fcheck-references %<fno-check-references\
-		   %<ffilelist-file %<fsaw-java-file %<fsource* %<ftarget*\
-		   %{f*} -fdollars-in-identifiers\
-		   %{aux-info*}\
-		   %{pg:%{fomit-frame-pointer:%e-pg and -fomit-frame-pointer are incompatible}}\
-		   %{S:%W{o*}%{!o*:-o %b.s}}\
+     %{!Q:-quiet} -dumpbase %b.c %{d*} %{m*}\
+     %{g*} %{O*} %I \
+     %{v:-version} %{pg:-p} %{p}\
+     %<fbounds-check %<fno-bounds-check\
+     %<fassume-compiled* %<fno-assume-compiled*\
+     %<fcompile-resource* %<fassert %<fno-assert \
+     %<femit-class-file %<femit-class-files %<fencoding*\
+     %<fuse-boehm-gc %<fhash-synchronization %<fjni\
+     %<findirect-dispatch\
+     %<fno-store-check %<foutput-class-dir\
+     %<fclasspath* %<fbootclasspath*\
+     %<fextdirs*\
+     %<fuse-divide-subroutine %<fno-use-divide-subroutine\
+     %<fuse-atomic-builtins %<fno-use-atomic-builtins\
+     %<fcheck-references %<fno-check-references\
+     %<ffilelist-file %<fsaw-java-file %<fsource* %<ftarget*\
+     %{f*} -fdollars-in-identifiers\
+     %{aux-info*}\
+     %{pg:%{fomit-frame-pointer:%e-pg and -fomit-frame-pointer are incompatible}}\
+     %{S:%W{o*}%{!o*:-o %b.s}}\
    %(invoke_as)";
 
 /* Return full path name of spec file if it is in DIR, or NULL if
