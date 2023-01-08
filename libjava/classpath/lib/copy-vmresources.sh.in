@@ -5,6 +5,7 @@ top_srcdir=@top_srcdir@
 vmdirs=`echo "@vm_classes@" | sed 's%:% %g'`
 destMetaDir=`pwd`/META-INF
 destResDir=`pwd`
+MKDIR_P = @MKDIR_P@
 
 for p in ${vmdirs}; do
 	if test -d $p/META-INF; then
