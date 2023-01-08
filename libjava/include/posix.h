@@ -51,7 +51,8 @@ details.  */
 #define _Jv_platform_solib_suffix ".so"
 #endif
 
-#if __MACH__ && (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 1060)
+#if __APPLE__ && (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 1060) \
+   && (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 1070)
 #  undef _Unwind_FindEnclosingFunction
 #  define _Unwind_FindEnclosingFunction(PC) _darwin10_Unwind_FindEnclosingFunction(PC)
 #endif
