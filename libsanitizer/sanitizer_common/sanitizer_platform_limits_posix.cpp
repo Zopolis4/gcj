@@ -467,9 +467,6 @@ unsigned struct_ElfW_Phdr_sz = sizeof(Elf_Phdr);
   unsigned struct_input_id_sz = sizeof(struct input_id);
   unsigned struct_mtpos_sz = sizeof(struct mtpos);
   unsigned struct_rtentry_sz = sizeof(struct rtentry);
-#if SANITIZER_GLIBC || SANITIZER_ANDROID
-  unsigned struct_termio_sz = sizeof(struct termio);
-#endif
   unsigned struct_vt_consize_sz = sizeof(struct vt_consize);
   unsigned struct_vt_sizes_sz = sizeof(struct vt_sizes);
   unsigned struct_vt_stat_sz = sizeof(struct vt_stat);
@@ -746,13 +743,9 @@ unsigned struct_ElfW_Phdr_sz = sizeof(Elf_Phdr);
   unsigned IOCTL_SOUND_PCM_WRITE_FILTER = SOUND_PCM_WRITE_FILTER;
 #endif // SOUND_VERSION
   unsigned IOCTL_TCFLSH = TCFLSH;
-  unsigned IOCTL_TCGETA = TCGETA;
   unsigned IOCTL_TCGETS = TCGETS;
   unsigned IOCTL_TCSBRK = TCSBRK;
   unsigned IOCTL_TCSBRKP = TCSBRKP;
-  unsigned IOCTL_TCSETA = TCSETA;
-  unsigned IOCTL_TCSETAF = TCSETAF;
-  unsigned IOCTL_TCSETAW = TCSETAW;
   unsigned IOCTL_TCSETS = TCSETS;
   unsigned IOCTL_TCSETSF = TCSETSF;
   unsigned IOCTL_TCSETSW = TCSETSW;
