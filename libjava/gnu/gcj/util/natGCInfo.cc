@@ -41,7 +41,7 @@ struct gc_debug_info
 };
 
 static void
-GC_print_debug_callback(GC_hblk_s *h, GC_word user_data)
+GC_print_debug_callback(GC_hblk_s *h, void* user_data)
 {
   size_t bytes;
 
@@ -58,7 +58,7 @@ struct print_hblkfl_s {
 };
 
 static void GC_CALLBACK print_hblkfl_file_item(struct GC_hblk_s *h, int i,
-					       GC_word client_data)
+					       void* client_data)
 {
   GC_word sz;
   print_hblkfl_s *pdata = (print_hblkfl_s *)client_data;
@@ -90,7 +90,7 @@ GC_print_hblkfreelist_file(FILE *fp)
   data.prev_index = -1;
     
   fprintf(fp, "---------- Begin free map ----------\n");
-  GC_iterate_free_hblks(print_hblkfl_file_item, (GC_word)&data);
+  GC_iterate_free_hblks(print_hblkfl_file_item, &data);
   fprintf(fp, "Total of %lu bytes on free list\n",
 	   (unsigned long)data.total_free);
   fprintf(fp, "---------- End free map ----------\n");
@@ -109,7 +109,7 @@ GC_print_debug_info_file(FILE* fp)
   if (gc_ok)
     GC_gcollect();
   fprintf(info.fp, "---------- Begin block map ----------\n");
-  GC_apply_to_all_blocks(GC_print_debug_callback, (GC_word)(void*)(&info));
+  GC_apply_to_all_blocks(GC_print_debug_callback, &info);
   //fprintf(fp, "#Total used %d free %d wasted %d\n", info.used, info.free, info.wasted);
   //fprintf(fp, "#Total blocks %d; %dK bytes\n", info.blocks, info.blocks*4);
   fprintf(info.fp, "---------- End block map ----------\n");
@@ -131,7 +131,7 @@ namespace
 
     void print_address_map();
     void enumerate_callback(GC_hblk_s *h);
-    static void enumerate_callback_adaptor(GC_hblk_s *h, GC_word dummy);
+    static void enumerate_callback_adaptor(GC_hblk_s *h, void* dummy);
   };
 }
 
@@ -236,7 +236,7 @@ GC_enumerator::enumerate()
   if (gc_ok)
     GC_gcollect();
   GC_apply_to_all_blocks(enumerate_callback_adaptor, 
-			 (GC_word)(void*)(this));
+			 this);
   fprintf(fp, "---------- End object map ----------\n");
   fflush(fp); 
 
@@ -253,7 +253,7 @@ GC_enumerator::enumerate()
 
 void
 GC_enumerator::enumerate_callback_adaptor(GC_hblk_s *h,
-					  GC_word dummy)
+					  void* dummy)
 {
   GC_enumerator* pinfo = (GC_enumerator*)dummy;
   pinfo->enumerate_callback(h);

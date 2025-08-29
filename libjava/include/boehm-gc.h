@@ -29,7 +29,7 @@ extern "C"
 
 #include <gc/gc.h> // for THREAD_LOCAL_ALLOC
 
-extern "C" void * GC_gcj_malloc(size_t, void *);
+extern "C" void * GC_gcj_malloc(size_t, const void *);
 extern "C" void * GC_malloc_atomic(size_t);
 #ifdef THREAD_LOCAL_ALLOC
 extern "C" void * GC_local_gcj_malloc(size_t, void *);
